@@ -1,0 +1,34 @@
+.slide-inner::before {
+  content: "HTML—PPT";
+  position: absolute;
+  right: 70px;
+  top: 34px;
+  color: var(--hp-color-muted);
+  font: 700 11px/1 Arial, sans-serif;
+  letter-spacing: .22em;
+}
+
+.layout-cover .slide-title,
+.layout-ending .slide-title {
+  max-width: 840px;
+  font-style: italic;
+}
+
+.layout-section .slide-title::after {
+  content: "";
+  display: block;
+  width: 180px;
+  height: 7px;
+  margin-top: 30px;
+  background: var(--hp-color-accent);
+}
+
+.column,
+.metric,
+.timeline-item {
+  border-left: 1px solid var(--hp-color-accent);
+}
+
+.metric strong {
+  letter-spacing: -.06em;
+}

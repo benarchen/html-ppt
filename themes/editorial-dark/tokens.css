@@ -1,0 +1,18 @@
+:root {
+  --hp-font-display: Georgia, "Times New Roman", serif;
+  --hp-font-heading: Georgia, "Times New Roman", serif;
+  --hp-font-body: Arial, sans-serif;
+  --hp-color-background: #111318;
+  --hp-color-surface: #1b1e26;
+  --hp-color-text: #f1eee6;
+  --hp-color-muted: #a8a6a0;
+  --hp-color-accent: #d8ff57;
+  --hp-color-accent-alt: #8b7bff;
+  --hp-color-border: #353946;
+  --hp-spacing-unit: 8px;
+  --hp-radius-small: 2px;
+  --hp-radius-large: 4px;
+  --hp-safe-area: 68px;
+  --hp-image-radius: 4px;
+  --hp-image-filter: grayscale(.25) contrast(1.12);
+}

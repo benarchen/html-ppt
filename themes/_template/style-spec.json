@@ -1,0 +1,28 @@
+{
+  "name": "replace-me",
+  "source": {
+    "type": "reference-image",
+    "reference": "references/replace-me.png",
+    "origin": "待填写",
+    "license": "待确认",
+    "sha256": "待生成"
+  },
+  "observations": {
+    "palette": [],
+    "typography": "待提取",
+    "spacing": "待提取",
+    "geometry": "待提取",
+    "layoutGrammar": "待提取",
+    "imageTreatment": "待提取",
+    "chartStyle": "待提取"
+  },
+  "confidence": {
+    "palette": "low",
+    "typography": "low",
+    "spacing": "low",
+    "imageTreatment": "low",
+    "chartStyle": "low"
+  },
+  "unresolved": ["待审核"],
+  "forbidden": []
+}

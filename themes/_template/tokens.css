@@ -1,0 +1,18 @@
+:root {
+  --hp-font-display: Arial, sans-serif;
+  --hp-font-heading: Arial, sans-serif;
+  --hp-font-body: Arial, sans-serif;
+  --hp-color-background: #ffffff;
+  --hp-color-surface: #f5f5f5;
+  --hp-color-text: #111111;
+  --hp-color-muted: #666666;
+  --hp-color-accent: #3366ff;
+  --hp-color-accent-alt: #6633ff;
+  --hp-color-border: #dddddd;
+  --hp-spacing-unit: 8px;
+  --hp-radius-small: 8px;
+  --hp-radius-large: 16px;
+  --hp-safe-area: 64px;
+  --hp-image-radius: 16px;
+  --hp-image-filter: none;
+}

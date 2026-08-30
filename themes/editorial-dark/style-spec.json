@@ -1,0 +1,24 @@
+{
+  "name": "editorial-dark",
+  "source": {
+    "type": "internal-exercise",
+    "reference": "references/reference.svg",
+    "license": "project-owned",
+    "sha256": "ba182ba2777e2e5b5c54b3e7f115b0fc888a548c531dd87a8db11cecb5b28a86"
+  },
+  "observations": {
+    "palette": ["#111318", "#f1eee6", "#d8ff57", "#8b7bff"],
+    "typography": "serif display with sans-serif body",
+    "geometry": "square editorial cards with thin accent rules",
+    "density": "medium"
+  },
+  "confidence": {
+    "palette": "high",
+    "typography": "high",
+    "spacing": "high",
+    "imageTreatment": "medium",
+    "chartStyle": "medium"
+  },
+  "unresolved": [],
+  "forbidden": ["remote fonts", "rounded pill cards", "heavy drop shadows"]
+}

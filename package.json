@@ -1,0 +1,42 @@
+{
+  "name": "html-ppt",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Markdown-driven, HTML-first presentation generator",
+  "license": "UNLICENSED",
+  "engines": {
+    "node": ">=24 <27"
+  },
+  "bin": {
+    "html-ppt": "./build/src/cli.js"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "npm run build && node --test build/tests/unit/*.test.js build/tests/integration/*.test.js",
+    "test:browser": "npm run build && PLAYWRIGHT_BROWSERS_PATH=0 HTML_PPT_NETWORK_TESTS=1 node --test build/tests/browser/*.test.js build/tests/integration/*.test.js",
+    "test:visual": "npm run build && PLAYWRIGHT_BROWSERS_PATH=0 playwright test",
+    "test:visual:update": "npm run build && PLAYWRIGHT_BROWSERS_PATH=0 playwright test --update-snapshots",
+    "html-ppt": "node build/src/cli.js",
+    "deck:build": "npm run build --silent && node build/src/cli.js build",
+    "deck:preview": "npm run build --silent && node build/src/cli.js preview",
+    "deck:export": "npm run build --silent && node build/src/cli.js export",
+    "deck:check": "npm run build --silent && node build/src/cli.js check",
+    "check:themes": "npm run build --silent && node build/src/cli.js check-themes"
+  },
+  "dependencies": {
+    "remark-directive": "4.0.0",
+    "remark-frontmatter": "5.0.0",
+    "remark-gfm": "4.0.1",
+    "remark-parse": "11.0.0",
+    "unified": "11.0.5",
+    "yaml": "2.9.0"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.62.1",
+    "@types/node": "24.13.3",
+    "pdfjs-dist": "6.3.289",
+    "typescript": "7.0.2"
+  }
+}

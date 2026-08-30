@@ -1,0 +1,18 @@
+:root {
+  --hp-font-display: Inter, Arial, sans-serif;
+  --hp-font-heading: Inter, Arial, sans-serif;
+  --hp-font-body: Inter, Arial, sans-serif;
+  --hp-color-background: #f5f1e8;
+  --hp-color-surface: #fffdf8;
+  --hp-color-text: #18202a;
+  --hp-color-muted: #68717d;
+  --hp-color-accent: #ef5b3f;
+  --hp-color-accent-alt: #2d7a78;
+  --hp-color-border: #d9d2c6;
+  --hp-spacing-unit: 8px;
+  --hp-radius-small: 10px;
+  --hp-radius-large: 24px;
+  --hp-safe-area: 64px;
+  --hp-image-radius: 24px;
+  --hp-image-filter: saturate(.92) contrast(1.04);
+}

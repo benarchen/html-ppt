@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1000" viewBox="0 0 1600 1000" role="img" aria-labelledby="title desc">
+  <title id="title">抽象网格示例图</title>
+  <desc id="desc">蓝紫渐变背景上的几何网格与圆形</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#13213c"/>
+      <stop offset="0.55" stop-color="#4056d8"/>
+      <stop offset="1" stop-color="#d850af"/>
+    </linearGradient>
+    <pattern id="grid" width="80" height="80" patternUnits="userSpaceOnUse">
+      <path d="M 80 0 L 0 0 0 80" fill="none" stroke="#ffffff" stroke-opacity=".12" stroke-width="2"/>
+    </pattern>
+  </defs>
+  <rect width="1600" height="1000" fill="url(#bg)"/>
+  <rect width="1600" height="1000" fill="url(#grid)"/>
+  <circle cx="1180" cy="330" r="230" fill="#f7d35d" fill-opacity=".92"/>
+  <circle cx="1180" cy="330" r="145" fill="#13213c" fill-opacity=".78"/>
+  <path d="M180 760 C430 460 610 930 920 610" fill="none" stroke="#ffffff" stroke-width="36" stroke-linecap="round"/>
+</svg>

@@ -1,0 +1,34 @@
+{
+  "name": "editorial-dark",
+  "version": "0.1.0",
+  "schemaVersion": 1,
+  "engine": ">=0.1 <1",
+  "canvas": {
+    "ratio": "16:9",
+    "width": 1280,
+    "height": 720,
+    "safeArea": 68,
+    "grid": { "columns": 12, "gap": 20 }
+  },
+  "typography": {
+    "display": { "family": "Georgia, Times New Roman, serif", "minSize": 48 },
+    "heading": { "family": "Georgia, Times New Roman, serif", "minSize": 24 },
+    "body": { "family": "Arial, sans-serif", "minSize": 18 },
+    "caption": { "family": "ui-monospace, monospace", "minSize": 14 }
+  },
+  "colors": {
+    "background": "#111318",
+    "surface": "#1b1e26",
+    "text": "#f1eee6",
+    "muted": "#a8a6a0",
+    "accent": "#d8ff57",
+    "accentAlt": "#8b7bff",
+    "border": "#353946"
+  },
+  "spacing": { "unit": 8 },
+  "radii": { "small": 2, "large": 4 },
+  "shadows": { "card": "0 24px 70px rgba(0, 0, 0, 0.36)" },
+  "imageTreatment": { "radius": 4, "filter": "grayscale(0.25) contrast(1.12)" },
+  "chartPalette": ["#d8ff57", "#8b7bff", "#ff7b6b", "#5ed4c6"],
+  "supportedLayouts": ["cover", "section", "title-body", "two-column", "image-text", "metrics", "comparison", "timeline", "quote", "chart", "full-bleed-image", "ending"]
+}
