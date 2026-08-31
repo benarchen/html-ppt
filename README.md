@@ -2,6 +2,10 @@
 
 一个以 Markdown 为内容入口、以结构化 Deck IR 为核心、以 HTML 为唯一视觉真相源的多风格演示文稿生成器。
 
+公开仓库：https://github.com/benarchen/html-ppt
+
+当前基线版本：`v0.1.0`。
+
 ## 当前能力
 
 - 解析 YAML frontmatter、分页、GFM 表格／任务列表、代码、图片和 `metric` directive。
