@@ -74,6 +74,63 @@ test("浏览器窗口变化只缩放固定逻辑画布", async () => {
   })
 })
 
+test("cosmic-mint 背景包含旋转地球、非同步流星和静态降级", async () => {
+  const temp = await mkdtemp(path.join(os.tmpdir(), "html-ppt-cosmic-motion-test-"))
+  const compiled = await compileDeck({ projectRoot: root, inputPath: input, themeName: "cosmic-mint" })
+  const build = await writeBuild(compiled, path.join(temp, "artifact"), temp)
+  await withRenderedPage(build.htmlPath, 1, async (page) => {
+    const slides = page.locator(".slide")
+    const running = await slides.first().evaluate((slide) => {
+      const earth = getComputedStyle(slide, "::before")
+      const meteor = getComputedStyle(slide, "::after")
+      return {
+        galaxyBackground: getComputedStyle(slide).backgroundImage,
+        earthAnimation: earth.animationName,
+        earthBackground: earth.backgroundImage,
+        earthDuration: earth.animationDuration,
+        meteorAnimation: meteor.animationName,
+        meteorBackground: meteor.backgroundImage,
+        meteorDuration: meteor.animationDuration,
+        meteorDelay: meteor.animationDelay,
+      }
+    })
+    const secondMeteor = await slides.nth(1).evaluate((slide) => {
+      const meteor = getComputedStyle(slide, "::after")
+      return { duration: meteor.animationDuration, delay: meteor.animationDelay }
+    })
+    assert.match(running.galaxyBackground, /data:image\/svg\+xml;base64/)
+    assert.equal(running.earthAnimation, "hp-earth-turn")
+    assert.equal(running.earthDuration, "48s")
+    assert.match(running.earthBackground, /data:image\/svg\+xml;base64/)
+    assert.equal(running.meteorAnimation, "hp-meteor-cross")
+    assert.equal(running.meteorBackground.match(/linear-gradient/g)?.length, 2)
+    assert.equal(running.meteorDuration, "5.8s")
+    assert.notDeepEqual([running.meteorDuration, running.meteorDelay], [secondMeteor.duration, secondMeteor.delay])
+
+    const probe = await page.addStyleTag({ content: ".slide::before,.slide::after{animation-delay:0s!important;animation-duration:2s!important}" })
+    const before = await slides.first().evaluate((slide) => ({
+      earth: getComputedStyle(slide, "::before").backgroundPosition,
+      meteor: getComputedStyle(slide, "::after").transform,
+    }))
+    await page.waitForTimeout(350)
+    const after = await slides.first().evaluate((slide) => ({
+      earth: getComputedStyle(slide, "::before").backgroundPosition,
+      meteor: getComputedStyle(slide, "::after").transform,
+    }))
+    assert.notEqual(after.earth, before.earth)
+    assert.notEqual(after.meteor, before.meteor)
+    await probe.evaluate((element) => element.parentNode?.removeChild(element))
+
+    await page.emulateMedia({ reducedMotion: "reduce" })
+    const reduced = await slides.first().evaluate((slide) => ({
+      earthAnimation: getComputedStyle(slide, "::before").animationName,
+      meteorAnimation: getComputedStyle(slide, "::after").animationName,
+      meteorOpacity: getComputedStyle(slide, "::after").opacity,
+    }))
+    assert.deepEqual(reduced, { earthAnimation: "none", meteorAnimation: "none", meteorOpacity: "0.62" })
+  })
+})
+
 test("CLI 原子导出写完成标记，失败不产生最终目录", async () => {
   const project = await mkdtemp(path.join(os.tmpdir(), "html-ppt-atomic-export-"))
   await Promise.all([
@@ -82,7 +139,7 @@ test("CLI 原子导出写完成标记，失败不产生最终目录", async () =
   ])
   const cli = path.join(root, "build", "src", "cli.js")
   const env = { ...process.env, PLAYWRIGHT_BROWSERS_PATH: "0" }
-  const success = spawnSync(process.execPath, [cli, "export", "examples/specimen.md", "--theme", "base-light", "--format", "pdf", "--output", "release", "--log-level", "quiet"], {
+  const success = spawnSync(process.execPath, [cli, "export", "examples/specimen.md", "--theme", "editorial-dark", "--format", "all", "--output", "release", "--log-level", "quiet"], {
     cwd: project,
     env,
     encoding: "utf8",
@@ -95,6 +152,7 @@ test("CLI 原子导出写完成标记，失败不产生最终目录", async () =
   const report = JSON.parse(await readFile(path.join(project, "release", "report.json"), "utf8")) as { runtime: { browserVersion: string } }
   assert.equal(delivery.status, "complete")
   assert.equal(delivery.files.includes("deck.pdf"), true)
+  assert.equal(delivery.files.includes("theme-review.html"), true)
   assert.equal(metadata.runtime.chromium, report.runtime.browserVersion)
   assert.notEqual(metadata.runtime.chromium, "not-run")
 

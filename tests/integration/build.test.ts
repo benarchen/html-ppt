@@ -61,6 +61,7 @@ test("缺失资源和未知主题明确失败", async () => {
 test("每个主题 specimen 覆盖全部标准布局", async () => {
   assert.deepEqual(await checkThemeSpecimens(root), [
     { theme: "base-light", slideCount: 12 },
+    { theme: "cosmic-mint", slideCount: 12 },
     { theme: "editorial-dark", slideCount: 12 },
   ])
 })

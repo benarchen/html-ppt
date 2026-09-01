@@ -1,0 +1,25 @@
+:root {
+  --hp-font-display: Arial, "PingFang SC", sans-serif;
+  --hp-font-heading: Arial, "PingFang SC", sans-serif;
+  --hp-font-body: Arial, "PingFang SC", sans-serif;
+  --hp-color-background: #030617;
+  --hp-color-surface: #080d25;
+  --hp-color-text: #f5f7ff;
+  --hp-color-muted: #a8b0c4;
+  --hp-color-accent: #7debd6;
+  --hp-color-accent-alt: #6577d8;
+  --hp-color-border: #2a3454;
+  --hp-spacing-unit: 8px;
+  --hp-radius-small: 8px;
+  --hp-radius-large: 14px;
+  --hp-safe-area: 72px;
+  --hp-image-radius: 14px;
+  --hp-image-filter: saturate(1.08) contrast(1.08) brightness(.88);
+  --hp-cosmic-glow: rgba(125, 235, 214, .15);
+  --hp-cosmic-violet: rgba(101, 119, 216, .16);
+  --hp-cosmic-panel: rgba(8, 13, 37, .78);
+  --hp-cosmic-star: rgba(226, 255, 249, .68);
+  --hp-cosmic-galaxy: rgba(107, 91, 205, .2);
+  --hp-cosmic-earth: rgba(125, 235, 214, .34);
+  --hp-cosmic-meteor: rgba(214, 255, 247, .92);
+}

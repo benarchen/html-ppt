@@ -1,0 +1,248 @@
+{
+  "name": "cosmic-mint",
+  "version": "0.1.2",
+  "extractedAt": "2026-08-31",
+  "source": {
+    "type": "reference-image",
+    "reference": "references/reference.png",
+    "origin": "user-provided conversation Image #1, recovered from the matching local Codex clipboard cache",
+    "license": "local-analysis-only",
+    "publication": false,
+    "format": "png",
+    "width": 2118,
+    "height": 1112,
+    "sha256": "09ab258c06ae0d02c7a37e43b04e60ef8c90b6fa8317835b255beb77d9b611fa",
+    "reviewEvidence": [
+      {
+        "reference": "references/feedback-motion.png",
+        "origin": "user-provided annotated review screenshot and written clarification",
+        "license": "local-analysis-only",
+        "publication": false,
+        "format": "png",
+        "width": 1668,
+        "height": 854,
+        "sha256": "5c962c87bb1b617dae19af9848b5a95fc669c6696458d29dc664f82a0b33a676",
+        "note": "The red rectangle marks a meteor trail; the annotation itself and capture UI are excluded from the theme."
+      },
+      {
+        "reference": "references/feedback-earth-01.png",
+        "origin": "user-provided close reference for the dotted Earth, Americas-facing frame",
+        "license": "local-analysis-only",
+        "publication": false,
+        "format": "png",
+        "width": 1222,
+        "height": 1348,
+        "sha256": "9748ac7e52fcd20ee74cabcc3e5dcbe516b87ba121dd70e31c728d4fe99b6101",
+        "note": "Confirms tiny dots are restricted to land, with dark unfilled oceans and a restrained blue rim."
+      },
+      {
+        "reference": "references/feedback-earth-02.png",
+        "origin": "user-provided close reference for the dotted Earth, Africa-facing frame",
+        "license": "local-analysis-only",
+        "publication": false,
+        "format": "png",
+        "width": 1208,
+        "height": 1300,
+        "sha256": "0ea60b36106219a2341cbdf3ffa3b551051300b15ec35cc779f63fff45f8d4b4",
+        "note": "Confirms continent silhouettes move through a circular globe window while oceans remain visually empty."
+      },
+      {
+        "reference": "references/feedback-earth-03.png",
+        "origin": "user-provided close reference for the dotted Earth, alternate Americas-facing frame",
+        "license": "local-analysis-only",
+        "publication": false,
+        "format": "png",
+        "width": 1218,
+        "height": 1304,
+        "sha256": "79f5408215c9d1170297e31e5a43f38c345f2735c98422fe111e02c2eb5b4f99",
+        "note": "Confirms the rotation is slow and the land-dot texture stays fine and low contrast."
+      },
+      {
+        "reference": "references/feedback-galaxy.png",
+        "origin": "user-provided close reference for the galaxy background",
+        "license": "local-analysis-only",
+        "publication": false,
+        "format": "png",
+        "width": 3334,
+        "height": 1694,
+        "sha256": "01a433cd3ec2138ae6ead3d197c1f10dbec42ad086703cb804fd3f34c4d89a0b",
+        "note": "Confirms a natural granular diagonal Milky Way band rather than a smooth gradient color block."
+      },
+      {
+        "reference": "references/feedback-meteors.png",
+        "origin": "user-provided close reference for meteor styling",
+        "license": "local-analysis-only",
+        "publication": false,
+        "format": "png",
+        "width": 1122,
+        "height": 778,
+        "sha256": "86723fe2db5c9962535fa7c03a8c2b9fe75b7f965d30b04a964f9861839b10a6",
+        "note": "Confirms two thin staggered pale trails and supports a slightly faster crossing speed."
+      }
+    ]
+  },
+  "observations": {
+    "canvas": {
+      "fact": "The captured frame is 2118 × 1112 and contains a widescreen presentation inside a live-stream capture.",
+      "treatment": "Use the project 16:9 canvas; do not reproduce live-stream chrome."
+    },
+    "palette": [
+      { "role": "background", "value": "#030617", "evidence": "Near-black blue dominates the sampled frame." },
+      { "role": "surface", "value": "#080D25", "evidence": "The code panel is a slightly lighter indigo surface." },
+      { "role": "text", "value": "#F5F7FF", "evidence": "Primary explanatory copy is cool white." },
+      { "role": "muted", "value": "#A8B0C4", "evidence": "Secondary details use a cool blue gray." },
+      { "role": "accent", "value": "#7DEBD6", "evidence": "The main title uses a luminous mint cyan." },
+      { "role": "accentAlt", "value": "#6577D8", "evidence": "Low-contrast violet-blue light appears in the background." },
+      { "role": "border", "value": "#2A3454", "evidence": "The main panel uses a thin cool-indigo outline." }
+    ],
+    "typography": {
+      "fact": "Large bold sans-serif display type, smaller bold sans-serif subheading, and monospaced instructional content form three clear levels.",
+      "scale": "Display is roughly 2.2–2.6 times body size; body uses generous line spacing.",
+      "alignment": "All presentation content is left aligned.",
+      "fallback": "System sans-serif and system monospace only; the exact source font is unknown."
+    },
+    "spacing": {
+      "fact": "The layout uses a broad left margin, a compact vertical title stack, then a single wide content panel.",
+      "system": "8px base unit, 72px safe area, 24px grid gap, and 24–32px component padding."
+    },
+    "geometry": {
+      "fact": "The primary container is a wide low-contrast rectangle with a fine outline and restrained corner radius.",
+      "treatment": "Use 8–14px radii, 1px borders, and no heavy card shadows."
+    },
+    "layoutGrammar": {
+      "fact": "One dominant title, one explanatory line, and one main information region create a top-to-bottom reading path.",
+      "density": "Medium-low outside the main panel and medium inside it.",
+      "extension": "Other layouts retain a single dominant composition rather than dashboard-like card collections."
+    },
+    "imageTreatment": {
+      "fact": "No content photograph is used; the background is structured by a granular diagonal galaxy haze, layered stars, glow, and a partial Earth whose land alone is rendered with tiny dots.",
+      "extension": "Use CSS gradients and restrained translucent overlays; supplied images receive a cool, slightly saturated treatment."
+    },
+    "graphicLanguage": {
+      "fact": "Layered stars, a natural diagonal Milky Way band, cyan-violet glow, and a large off-canvas Earth with continent-only dots provide recognisable depth without competing with text.",
+      "extension": "Rebuild the atmosphere with deterministic local SVG textures and CSS pseudo-elements; do not copy the source artwork."
+    },
+    "motion": {
+      "fact": "The user supplied three Earth frames that confirm slow rotation and a separate meteor reference showing two thin staggered trails crossing at irregular intervals.",
+      "treatment": "Use a 48-second continuous continent-strip drift and non-synchronised 5.8–7.6-second two-trail meteor cycles across slides. Freeze both at a stable representative frame for print and reduced-motion users.",
+      "fallback": "The static frame must still show a readable continent-only dotted Earth and two restrained meteor trails."
+    },
+    "chartStyle": {
+      "fact": "The reference does not show a chart.",
+      "extension": "Use mint as the primary series, cool violet and cyan as secondary series, dark tracks, and direct labels."
+    },
+    "excludedCaptureUi": [
+      "live comments and notification bubbles",
+      "viewer count and like button",
+      "streaming platform controls",
+      "presenter or platform branding"
+    ]
+  },
+  "inferences": [
+    {
+      "id": "widescreen-canvas",
+      "decision": "Retain the project 1280 × 720 canvas.",
+      "rationale": "The captured image includes stream UI and is not itself the clean slide boundary.",
+      "confidence": "high"
+    },
+    {
+      "id": "cosmic-background",
+      "decision": "Rebuild the star field and diagonal granular galaxy as deterministic local SVG texture plus restrained CSS layers instead of embedding the source background.",
+      "rationale": "The reusable system is the depth, grain, and light hierarchy, not the proprietary raster texture or a smooth gradient block.",
+      "confidence": "high"
+    },
+    {
+      "id": "earth-motion",
+      "decision": "Animate a code-native dotted world strip through a shaded circular globe window; only continent paths receive dots and ocean areas remain unpatterned.",
+      "rationale": "The three supplied frames explicitly reject a uniform full-sphere dot matrix and confirm slow land movement across a dark ocean.",
+      "confidence": "high"
+    },
+    {
+      "id": "meteor-motion",
+      "decision": "Animate two thin staggered luminous trails from upper-right to lower-left with three offset duration and delay groups.",
+      "rationale": "The close reference shows a paired trail treatment, and the user requested a slightly faster crossing speed while preserving irregular timing.",
+      "confidence": "high"
+    },
+    {
+      "id": "layout-extension",
+      "decision": "Use outlined translucent surfaces for metrics, comparisons, timelines, and charts.",
+      "rationale": "Only a single code panel is visible, so multi-layout component behavior is a design extension.",
+      "confidence": "medium"
+    },
+    {
+      "id": "image-extension",
+      "decision": "Apply a cool contrast and saturation filter to content images.",
+      "rationale": "No content image appears in the reference; the choice follows the observed cool luminous palette.",
+      "confidence": "low"
+    }
+  ],
+  "confidence": {
+    "palette": "high",
+    "typography": "medium",
+    "spacing": "high",
+    "geometry": "high",
+    "layoutGrammar": "medium",
+    "imageTreatment": "low",
+    "graphicLanguage": "high",
+    "motion": "high",
+    "chartStyle": "low"
+  },
+  "unresolved": [
+    { "area": "font-family", "reason": "The raster reference cannot prove the exact font family." },
+    { "area": "charts", "reason": "No chart or data visualization is visible." },
+    { "area": "photography", "reason": "No content photograph or crop behavior is visible." },
+    { "area": "light-background-variant", "reason": "The reference only demonstrates a dark presentation." },
+    { "area": "meteor-frequency", "reason": "The user confirmed irregular motion and two visible trails but did not specify an exact random distribution." }
+  ],
+  "forbidden": [
+    "copying the reference raster background into the theme",
+    "uniform dots covering the full globe including oceans",
+    "a smooth diagonal gradient used as a substitute for granular galaxy texture",
+    "reproducing live-stream comments, controls, counts, or platform branding",
+    "remote fonts or remote image URLs",
+    "warm beige or paper-like surfaces",
+    "rainbow gradients or neon colors outside the mint-cyan-violet system",
+    "heavy opaque drop shadows",
+    "pill-heavy dashboard styling",
+    "dense equal-weight card grids",
+    "theme selectors tied to slide ids or document-specific copy"
+  ],
+  "initialReview": {
+    "reviewer": "implementation self-review",
+    "scale": "1-5",
+    "scores": {
+      "colorLanguage": 5,
+      "typographicHierarchy": 4,
+      "gridAndWhitespace": 4,
+      "geometryAndComponents": 4,
+      "informationDensity": 4,
+      "imageAndDecoration": 3
+    },
+    "total": 24,
+    "gate": "pass-for-implementation",
+    "note": "Final acceptance remains subject to user review against the original reference."
+  },
+  "revisionHistory": [
+    {
+      "version": "0.1.1",
+      "total": 25,
+      "outcome": "rejected-by-user",
+      "reason": "The Earth used uniform full-sphere dots, the galaxy read as a color block, and the meteor treatment did not match the paired thin trails."
+    }
+  ],
+  "revisionReview": {
+    "reviewer": "implementation self-review after second user feedback",
+    "scale": "1-5",
+    "scores": {
+      "colorLanguage": 5,
+      "typographicHierarchy": 4,
+      "gridAndWhitespace": 4,
+      "geometryAndComponents": 4,
+      "informationDensity": 4,
+      "imageAndDecoration": 5
+    },
+    "total": 26,
+    "gate": "pass-for-user-rereview",
+    "note": "Revision replaces the rejected uniform-dot globe and smooth galaxy block with continent-only dots, granular Milky Way texture, and paired faster meteor trails; final acceptance remains with the user."
+  }
+}

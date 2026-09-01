@@ -10,7 +10,7 @@
 
 - 解析 YAML frontmatter、分页、GFM 表格／任务列表、代码、图片和 `metric` directive。
 - 生成稳定的 Deck IR 和 Planned Deck IR。
-- 提供 `base-light` 与 `editorial-dark` 两套主题。
+- 提供 `base-light`、`editorial-dark` 与 `cosmic-mint` 三套主题。
 - 支持 12 种标准布局与确定性内容拆页。
 - 生成可离线打开的静态 HTML。
 - 提供本地预览与源文件／主题热重载。
@@ -96,6 +96,16 @@ output/my-deck-export/
 
 同一份 Markdown 可以通过 `--theme` 切换主题，无需修改内容。新主题从 `themes/_template/` 开始，先完成 Style Spec，再实现 token、组件和全部布局 specimen。
 
+`cosmic-mint` 是首套由用户参考图提取并验收的正式主题，当前版本为 `0.1.2`。它使用颗粒化斜向银河、分层星空、右侧缓慢转动的陆地点阵地球和双流星构成背景；海洋区域不铺点阵，打印与减少动态效果环境会自动冻结为稳定静态帧。参考原图仅限本地分析且不会进入公开仓库；主题包只保留脱敏的 Style Spec、可复用 token、CSS 设计规则和代码生成的 SVG 资产。
+
+```bash
+npm run html-ppt -- build themes/cosmic-mint/specimen.md \
+  --theme cosmic-mint \
+  --output output/cosmic-mint-specimen
+```
+
+Goal 002 还使用一份仅限本地处理的真实 Markdown 验证了 27 页双主题构建、严格 Preflight 和全格式导出。该输入及其派生演示稿位于被 Git 忽略的 `inputs-private/`，不属于公开示例。
+
 ```bash
 npm run check:themes
 ```
@@ -130,5 +140,7 @@ npm run test:visual
 - [测试说明](docs/testing.md)
 - [依赖说明](docs/dependencies.md)
 - [v0.1 交付报告](docs/delivery-v0.1.md)
+- [Goal 002 交付报告](docs/delivery-goal-002.md)
 - [施工 Goal](goals/001-v0.1-mvp.md)
+- [Goal 002 施工清单](goals/002-reference-theme-real-deck.md)
 - [项目路线图](ROADMAP.md)

@@ -20,6 +20,15 @@ const REQUIRED_TOKEN_VARIABLES = [
   "--hp-radius-large",
 ] as const
 
+const THEME_ASSET_MIME_TYPES: Record<string, string> = {
+  ".gif": "image/gif",
+  ".jpeg": "image/jpeg",
+  ".jpg": "image/jpeg",
+  ".png": "image/png",
+  ".svg": "image/svg+xml",
+  ".webp": "image/webp",
+}
+
 export async function loadTheme(projectRoot: string, themeName: string): Promise<ThemePackage> {
   if (!/^[a-z0-9][a-z0-9-]*$/.test(themeName)) {
     throw new HtmlPptError("THEME_NAME", `非法主题名称：${themeName}`)
@@ -62,6 +71,10 @@ export async function loadTheme(projectRoot: string, themeName: string): Promise
   const manifest = validateManifest(raw, themeName, manifestPath)
   validateCss(tokensCss, componentsCss, manifestPath)
   await validateAssetPaths(root, `${tokensCss}\n${componentsCss}`)
+  ;[tokensCss, componentsCss] = await Promise.all([
+    inlineThemeAssets(root, tokensCss),
+    inlineThemeAssets(root, componentsCss),
+  ])
   return { root, manifest, tokensCss, componentsCss }
 }
 
@@ -158,6 +171,33 @@ async function validateAssetPaths(themeRoot: string, css: string): Promise<void>
       throw error
     }
   }
+}
+
+async function inlineThemeAssets(themeRoot: string, css: string): Promise<string> {
+  const matches = [...css.matchAll(/url\(\s*(?:"([^"]*)"|'([^']*)'|([^)'"\s]+))\s*\)/gi)]
+    .map((match) => ({
+      end: (match.index ?? 0) + match[0].length,
+      resource: match[1] ?? match[2] ?? match[3] ?? "",
+      start: match.index ?? 0,
+    }))
+    .filter(({ resource }) => resource !== "" && !resource.startsWith("#"))
+  if (matches.length === 0) return css
+
+  const replacements = await Promise.all(matches.map(async ({ resource }) => {
+    const assetPath = await resolveWorkspaceFile(themeRoot, themeRoot, resource, "THEME_ASSET_PATH")
+    const mime = THEME_ASSET_MIME_TYPES[path.extname(assetPath).toLowerCase()]
+    if (!mime) throw new HtmlPptError("THEME_ASSET_TYPE", `主题资产类型不受支持：${resource}`, { file: assetPath })
+    return `url("data:${mime};base64,${(await readFile(assetPath)).toString("base64")}")`
+  }))
+
+  let result = ""
+  let cursor = 0
+  matches.forEach((match, index) => {
+    result += css.slice(cursor, match.start)
+    result += replacements[index]
+    cursor = match.end
+  })
+  return result + css.slice(cursor)
 }
 
 function object(value: unknown, name: string, file: string): Record<string, unknown> {

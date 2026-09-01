@@ -1,0 +1,297 @@
+.slide {
+  --hp-meteor-duration: 5.8s;
+  --hp-meteor-delay: -1.4s;
+  background-color: #020411;
+  background:
+    radial-gradient(circle at 18% 34%, var(--hp-cosmic-star) 0 1px, transparent 1.7px) 0 0 / 137px 101px repeat,
+    radial-gradient(circle at 72% 16%, rgba(245, 247, 255, .44) 0 1px, transparent 1.6px) 0 0 / 211px 157px repeat,
+    radial-gradient(circle at 42% 78%, rgba(125, 235, 214, .3) 0 1px, transparent 1.8px) 0 0 / 173px 139px repeat,
+    url("assets/galaxy-field.svg") center / cover no-repeat,
+    radial-gradient(ellipse at 10% 106%, rgba(90, 91, 180, .16), transparent 34%),
+    linear-gradient(118deg, #020411 0%, #08051b 48%, #031118 100%);
+  background-blend-mode: screen, screen, screen, screen, normal, normal;
+}
+
+.slide::before {
+  content: "";
+  position: absolute;
+  z-index: 0;
+  width: 560px;
+  height: 560px;
+  right: -188px;
+  top: 82px;
+  border: 1px solid rgba(103, 184, 216, .2);
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 25% 28%, rgba(125, 235, 214, .08), transparent 42%),
+    linear-gradient(96deg, rgba(1, 4, 15, .76) 0%, transparent 31%, transparent 67%, rgba(1, 4, 15, .9) 100%),
+    url("assets/dotted-earth-strip.svg") -84px center / 1120px 520px repeat-x,
+    radial-gradient(circle at 38% 36%, rgba(24, 71, 94, .08), rgba(2, 7, 20, .42) 55%, rgba(1, 4, 15, .76) 100%);
+  background-blend-mode: screen, normal, screen, normal;
+  box-shadow:
+    inset 52px -8px 110px rgba(1, 4, 15, .9),
+    inset -16px 6px 48px rgba(88, 178, 214, .06),
+    0 0 2px rgba(105, 191, 224, .34),
+    0 0 64px rgba(55, 132, 170, .08);
+  opacity: .9;
+  transform: rotate(-5deg);
+  animation: hp-earth-turn 48s linear infinite;
+  pointer-events: none;
+}
+
+.slide::after {
+  content: "";
+  position: absolute;
+  z-index: 0;
+  width: 360px;
+  height: 150px;
+  left: 54%;
+  top: 7%;
+  background:
+    linear-gradient(90deg, transparent 0%, rgba(199, 207, 231, .08) 31%, rgba(231, 238, 249, .58) 82%, #fff 100%) right top / 270px 2px no-repeat,
+    linear-gradient(90deg, transparent 0%, rgba(199, 207, 231, .06) 29%, rgba(224, 234, 247, .52) 83%, #fff 100%) 28px 112px / 218px 1.5px no-repeat;
+  filter: drop-shadow(0 0 4px rgba(214, 225, 247, .52));
+  opacity: .68;
+  transform: translate3d(24px, -10px, 0) rotate(-29deg) scaleX(.94);
+  transform-origin: right center;
+  animation: hp-meteor-cross var(--hp-meteor-duration) cubic-bezier(.2, .06, .32, .96) infinite var(--hp-meteor-delay);
+  pointer-events: none;
+}
+
+.slide:nth-of-type(3n + 2) {
+  --hp-meteor-duration: 6.7s;
+  --hp-meteor-delay: -4.6s;
+}
+
+.slide:nth-of-type(3n) {
+  --hp-meteor-duration: 7.6s;
+  --hp-meteor-delay: -3.1s;
+}
+
+@keyframes hp-earth-turn {
+  0% {
+    background-position: center, center, -84px center, center;
+    transform: rotate(-5deg);
+  }
+  50% {
+    background-position: center, center, -644px center, center;
+    transform: rotate(-4deg);
+  }
+  100% {
+    background-position: center, center, -1204px center, center;
+    transform: rotate(-5deg);
+  }
+}
+
+@keyframes hp-meteor-cross {
+  0%, 48%, 100% {
+    opacity: .02;
+    transform: translate3d(390px, -220px, 0) rotate(-29deg) scaleX(.58);
+  }
+  6% {
+    opacity: .12;
+  }
+  15% {
+    opacity: .88;
+    transform: translate3d(38px, -14px, 0) rotate(-29deg) scaleX(1);
+  }
+  28% {
+    opacity: .02;
+    transform: translate3d(-390px, 218px, 0) rotate(-29deg) scaleX(.76);
+  }
+}
+
+@media print, (prefers-reduced-motion: reduce) {
+  .slide::before {
+    animation: none;
+    background-position: center, center, -364px center, center;
+    transform: rotate(-4.5deg);
+  }
+
+  .slide::after {
+    animation: none;
+    opacity: .62;
+    transform: translate3d(24px, -10px, 0) rotate(-29deg) scaleX(.94);
+  }
+}
+
+.slide-inner {
+  z-index: 1;
+}
+
+.slide-title {
+  color: var(--hp-color-accent);
+  font-weight: 780;
+  line-height: 1.22;
+  letter-spacing: -.025em;
+  text-shadow: 0 0 32px rgba(125, 235, 214, .08);
+}
+
+.slide-number {
+  right: 34px;
+  bottom: 24px;
+  color: rgba(168, 176, 196, .62);
+  font-family: SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+}
+
+.body-stack,
+.hero-shell,
+.text-pane {
+  position: relative;
+}
+
+.hero-body {
+  max-width: 820px;
+  color: var(--hp-color-text);
+}
+
+.layout-cover .slide-title,
+.layout-ending .slide-title {
+  max-width: 980px;
+  font-size: 86px;
+  line-height: 1.2;
+}
+
+.layout-cover .hero-shell::before,
+.layout-ending .hero-shell::before {
+  content: "";
+  width: 54px;
+  height: 5px;
+  margin-bottom: 10px;
+  border-radius: 999px;
+  background: var(--hp-color-accent);
+  box-shadow: 76px 0 0 rgba(101, 119, 216, .8);
+}
+
+.layout-section .slide-inner {
+  justify-content: center;
+}
+
+.layout-section .slide-title {
+  max-width: 860px;
+  font-size: 74px;
+}
+
+.layout-section .slide-title::after {
+  content: "";
+  display: block;
+  width: 240px;
+  height: 1px;
+  margin-top: 28px;
+  background: linear-gradient(90deg, var(--hp-color-accent), transparent);
+}
+
+h2 {
+  color: var(--hp-color-text);
+}
+
+ul li::marker,
+ol li::marker {
+  color: var(--hp-color-accent);
+}
+
+code {
+  color: var(--hp-color-accent);
+}
+
+pre,
+.column,
+.metric,
+.timeline-item {
+  border-color: rgba(125, 235, 214, .18);
+  background: var(--hp-cosmic-panel);
+  box-shadow: 0 22px 60px rgba(0, 0, 0, .18), inset 0 1px 0 rgba(245, 247, 255, .03);
+  backdrop-filter: blur(4px);
+}
+
+pre {
+  border-radius: var(--hp-radius-large);
+  color: var(--hp-color-text);
+  font-family: SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+}
+
+.column {
+  padding: 32px;
+}
+
+.layout-comparison .column:first-child {
+  border-top: 2px solid var(--hp-color-accent-alt);
+}
+
+.layout-comparison .column:last-child {
+  border-top: 2px solid var(--hp-color-accent);
+}
+
+.metric {
+  position: relative;
+  overflow: hidden;
+}
+
+.metric::after {
+  content: "";
+  position: absolute;
+  width: 64px;
+  height: 64px;
+  right: 18px;
+  bottom: 18px;
+  border: 1px solid rgba(125, 235, 214, .2);
+  border-radius: 50%;
+}
+
+.metric strong {
+  color: var(--hp-color-accent);
+  letter-spacing: -.055em;
+  text-shadow: 0 0 34px rgba(125, 235, 214, .16);
+}
+
+.timeline-item {
+  border-top: 1px solid rgba(125, 235, 214, .22);
+  border-radius: var(--hp-radius-small);
+}
+
+.timeline-item > span {
+  font-family: SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 15px;
+  letter-spacing: .14em;
+}
+
+.quote-shell {
+  justify-content: flex-start;
+}
+
+blockquote {
+  max-width: 1030px;
+  padding: 34px 38px;
+  border: 1px solid rgba(125, 235, 214, .22);
+  border-left: 6px solid var(--hp-color-accent);
+  border-radius: 0 var(--hp-radius-large) var(--hp-radius-large) 0;
+  background: var(--hp-cosmic-panel);
+  box-shadow: 0 22px 60px rgba(0, 0, 0, .18);
+}
+
+.chart-row > div {
+  border: 1px solid rgba(125, 235, 214, .12);
+  background: rgba(8, 13, 37, .82);
+}
+
+.chart-row i {
+  background: linear-gradient(90deg, var(--hp-color-accent-alt), var(--hp-color-accent));
+  box-shadow: 0 0 22px rgba(125, 235, 214, .18);
+}
+
+.image-pane img {
+  border: 1px solid rgba(125, 235, 214, .2);
+  box-shadow: 0 22px 60px rgba(0, 0, 0, .28);
+}
+
+.full-bleed-media::after {
+  background: linear-gradient(90deg, rgba(3, 6, 23, .94) 0%, rgba(3, 6, 23, .7) 48%, rgba(4, 22, 27, .22) 100%);
+}
+
+.full-bleed-overlay {
+  width: 74%;
+}
+
+.full-bleed-overlay .slide-title {
+  line-height: 1.24;
+}

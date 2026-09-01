@@ -7,16 +7,78 @@ import { checkAllThemes, loadTheme } from "../../src/theme.js"
 import { HtmlPptError } from "../../src/errors.js"
 import { sha256 } from "../../src/utils.js"
 
-test("两个主题通过同一契约", async () => {
+test("三个主题通过同一契约", async () => {
   const themes = await checkAllThemes(process.cwd())
-  assert.deepEqual(themes.map((theme) => theme.manifest.name), ["base-light", "editorial-dark"])
-  assert.deepEqual(themes[0]!.manifest.supportedLayouts, themes[1]!.manifest.supportedLayouts)
+  assert.deepEqual(themes.map((theme) => theme.manifest.name), ["base-light", "cosmic-mint", "editorial-dark"])
+  for (const theme of themes.slice(1)) assert.deepEqual(themes[0]!.manifest.supportedLayouts, theme.manifest.supportedLayouts)
 })
 
 test("主题 CSS 不包含远程资源", async () => {
-  for (const name of ["base-light", "editorial-dark"]) {
+  for (const name of ["base-light", "cosmic-mint", "editorial-dark"]) {
     const theme = await loadTheme(process.cwd(), name)
     assert.doesNotMatch(`${theme.tokensCss}\n${theme.componentsCss}`, /@import|https?:\/\//i)
+  }
+})
+
+test("主题本地视觉资产会内联到 HTML 使用的 CSS", async () => {
+  const theme = await loadTheme(process.cwd(), "cosmic-mint")
+  assert.match(theme.componentsCss, /url\("data:image\/svg\+xml;base64,/)
+  assert.doesNotMatch(theme.componentsCss, /url\(["']?assets\//)
+})
+
+test("cosmic-mint Style Spec 区分观察、推断和未决项", async () => {
+  const themeRoot = path.join(process.cwd(), "themes", "cosmic-mint")
+  const spec = JSON.parse(await readFile(path.join(themeRoot, "style-spec.json"), "utf8")) as {
+    version: string
+    source: {
+      reference: string
+      license: string
+      publication: boolean
+      width: number
+      height: number
+      sha256: string
+      reviewEvidence: Array<{ reference: string; publication: boolean; width: number; height: number; sha256: string }>
+    }
+    observations: Record<string, unknown>
+    inferences: Array<{ confidence: string }>
+    confidence: Record<string, string>
+    unresolved: unknown[]
+    forbidden: string[]
+    revisionReview: { total: number; gate: string }
+  }
+  assert.equal(spec.version, "0.1.2")
+  assert.equal(spec.source.license, "local-analysis-only")
+  assert.equal(spec.source.publication, false)
+  assert.deepEqual([spec.source.width, spec.source.height], [2118, 1112])
+  assert.match(spec.source.sha256, /^[\da-f]{64}$/)
+  assert.equal(spec.source.reviewEvidence.length, 6)
+  for (const evidence of spec.source.reviewEvidence) {
+    assert.equal(evidence.publication, false)
+    assert.match(evidence.sha256, /^[\da-f]{64}$/)
+  }
+  assert.equal(Object.keys(spec.observations).length >= 8, true)
+  assert.equal("motion" in spec.observations, true)
+  assert.equal(spec.inferences.length >= 3, true)
+  assert.equal(spec.inferences.every((item) => ["high", "medium", "low"].includes(item.confidence)), true)
+  assert.equal(Object.values(spec.confidence).every((value) => ["high", "medium", "low"].includes(value)), true)
+  assert.equal(spec.confidence.motion, "high")
+  assert.equal(spec.unresolved.length > 0, true)
+  assert.equal(spec.forbidden.length > 0, true)
+  assert.equal(spec.revisionReview.total >= 25, true)
+  assert.equal(spec.revisionReview.gate, "pass-for-user-rereview")
+  try {
+    const reference = await readFile(path.join(themeRoot, spec.source.reference))
+    assert.equal(sha256(reference), spec.source.sha256)
+  } catch (error) {
+    if ((error as NodeJS.ErrnoException).code !== "ENOENT") throw error
+  }
+  for (const evidence of spec.source.reviewEvidence) {
+    try {
+      const reference = await readFile(path.join(themeRoot, evidence.reference))
+      assert.equal(sha256(reference), evidence.sha256)
+    } catch (error) {
+      if ((error as NodeJS.ErrnoException).code !== "ENOENT") throw error
+    }
   }
 })
 

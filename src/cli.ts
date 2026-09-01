@@ -89,6 +89,7 @@ export async function main(argv = process.argv.slice(2)): Promise<number> {
     const expectedPages = compiled.plannedDeck.slides.length
     let pdfPages: number | undefined
     let pngPages: number | undefined
+    let themeReviewPath: string | undefined
     if (format === "pdf" || format === "all") {
       pdfPages = await exportPdf(build.htmlPath, path.join(build.outputDirectory, "deck.pdf"))
       if (pdfPages !== expectedPages) throw new HtmlPptError("EXPORT_PAGE_COUNT", `PDF 页数 ${pdfPages} 与 HTML 页数 ${expectedPages} 不一致`)
@@ -98,7 +99,7 @@ export async function main(argv = process.argv.slice(2)): Promise<number> {
       pngPages = pngFiles.length
       if (pngPages !== expectedPages) throw new HtmlPptError("EXPORT_PAGE_COUNT", `PNG 页数 ${pngPages} 与 HTML 页数 ${expectedPages} 不一致`)
       await exportContactSheet(build.outputDirectory, pngFiles, `${compiled.deck.meta.title} · ${compiled.theme.manifest.name}`)
-      await exportThemeReview(build.outputDirectory, pngFiles, compiled.theme)
+      themeReviewPath = await exportThemeReview(build.outputDirectory, pngFiles, compiled.theme)
     }
     const files = [
       "index.html",
@@ -108,7 +109,7 @@ export async function main(argv = process.argv.slice(2)): Promise<number> {
       "report.json",
       ...(format === "pdf" || format === "all" ? ["deck.pdf"] : []),
       ...(format === "png" || format === "all" ? ["slides/", "contact-sheet.html"] : []),
-      ...((format === "png" || format === "all") && compiled.theme.manifest.name === "editorial-dark" ? ["theme-review.html"] : []),
+      ...(themeReviewPath ? [path.basename(themeReviewPath)] : []),
     ]
     await writeFile(path.join(build.outputDirectory, "delivery.json"), `${JSON.stringify({
       schemaVersion: 1,

@@ -11,4 +11,8 @@ Thumbs.db
 .vscode/
 .agents/
 .codex/
+inputs-private/
+themes/cosmic-mint/references/reference.png
+themes/cosmic-mint/references/feedback-*.png
+tests/visual/snapshots/**/goal-002-private-*.png
 *.log

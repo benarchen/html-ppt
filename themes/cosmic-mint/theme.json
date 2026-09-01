@@ -1,0 +1,34 @@
+{
+  "name": "cosmic-mint",
+  "version": "0.1.2",
+  "schemaVersion": 1,
+  "engine": ">=0.1 <1",
+  "canvas": {
+    "ratio": "16:9",
+    "width": 1280,
+    "height": 720,
+    "safeArea": 72,
+    "grid": { "columns": 12, "gap": 24 }
+  },
+  "typography": {
+    "display": { "family": "Arial, PingFang SC, sans-serif", "minSize": 50 },
+    "heading": { "family": "Arial, PingFang SC, sans-serif", "minSize": 28 },
+    "body": { "family": "Arial, PingFang SC, sans-serif", "minSize": 18 },
+    "caption": { "family": "SFMono-Regular, Menlo, Monaco, Consolas, monospace", "minSize": 14 }
+  },
+  "colors": {
+    "background": "#030617",
+    "surface": "#080D25",
+    "text": "#F5F7FF",
+    "muted": "#A8B0C4",
+    "accent": "#7DEBD6",
+    "accentAlt": "#6577D8",
+    "border": "#2A3454"
+  },
+  "spacing": { "unit": 8 },
+  "radii": { "small": 8, "large": 14 },
+  "shadows": { "card": "0 22px 60px rgba(0, 0, 0, 0.24)" },
+  "imageTreatment": { "radius": 14, "filter": "saturate(1.08) contrast(1.08) brightness(0.88)" },
+  "chartPalette": ["#7DEBD6", "#6EC8E8", "#6577D8", "#F5F7FF"],
+  "supportedLayouts": ["cover", "section", "title-body", "two-column", "image-text", "metrics", "comparison", "timeline", "quote", "chart", "full-bleed-image", "ending"]
+}
