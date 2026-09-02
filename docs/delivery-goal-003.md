@@ -97,7 +97,7 @@
 
 ## Git 与发布状态
 
-用户已明确授权提交工作区、创建 `v0.3.0` 标签并通过现有 SSH 远端推送。GitHub Release、npm publish 和部署仍未授权，也不在本次操作范围。
+已创建实现提交 `8e6cb14` 和注解标签 `v0.3.0`，并通过 SSH 将 `main` 与标签推送到 `origin`。GitHub Release、npm publish、部署和 `release` 分支均未操作。
 
 ## 验收结论
 
