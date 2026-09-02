@@ -8,10 +8,16 @@ export interface PageDiagnostics {
   failedRequests: string[]
 }
 
+export interface RenderedPageOptions {
+  mode?: "presentation" | "render"
+  viewport?: { width: number; height: number }
+}
+
 export async function withRenderedPage<T>(
   htmlPath: string,
   deviceScaleFactor: number,
   action: (page: Page, diagnostics: PageDiagnostics) => Promise<T>,
+  options: RenderedPageOptions = {},
 ): Promise<T> {
   process.env.PLAYWRIGHT_BROWSERS_PATH ??= "0"
   const { chromium } = await import("@playwright/test")
@@ -21,7 +27,7 @@ export async function withRenderedPage<T>(
   } catch (error) {
     throw new HtmlPptError("BROWSER_START", "无法启动 Playwright Chromium", { file: htmlPath }, error instanceof Error ? error.message : undefined)
   }
-  const context = await browser.newContext({ viewport: { width: 1280, height: 720 }, deviceScaleFactor })
+  const context = await browser.newContext({ viewport: options.viewport ?? { width: 1280, height: 720 }, deviceScaleFactor })
   const page = await context.newPage()
   const diagnostics: PageDiagnostics = { consoleErrors: [], pageErrors: [], failedRequests: [] }
   page.on("console", (message) => {
@@ -31,7 +37,9 @@ export async function withRenderedPage<T>(
   page.on("requestfailed", (request) => diagnostics.failedRequests.push(`${request.url()} ${request.failure()?.errorText ?? "failed"}`))
   await page.route(/^(?:https?:)?\/\//, (route) => route.abort("blockedbyclient"))
   try {
-    await page.goto(pathToFileURL(htmlPath).href, { waitUntil: "load" })
+    const url = pathToFileURL(htmlPath)
+    url.searchParams.set("mode", options.mode ?? "presentation")
+    await page.goto(url.href, { waitUntil: "load" })
     await page.waitForFunction(() => document.documentElement.dataset.renderReady === "true", undefined, { timeout: 10_000 })
     return await action(page, diagnostics)
   } finally {

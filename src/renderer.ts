@@ -13,6 +13,8 @@ const MIME_TYPES: Record<string, string> = {
   ".svg": "image/svg+xml",
 }
 
+const SLIDE_DECORATIONS_HTML = Array.from({ length: 15 }, (_, index) => `<i class="hp-star" data-star-index="${index + 1}"></i>`).join("")
+
 export interface RenderOptions {
   projectRoot: string
   inputPath: string
@@ -42,7 +44,9 @@ ${renderedSlides.join("\n")}
 
 async function renderSlide(slide: PlannedSlide, theme: ThemePackage, options: RenderOptions): Promise<string> {
   const content = await renderLayout(slide, options)
-  return `    <section class="slide layout-${slide.layout}" id="${escapeAttribute(slide.id)}" data-slide-id="${escapeAttribute(slide.id)}" data-slide-index="${slide.index}" data-layout="${slide.layout}" data-safe-area="${theme.manifest.canvas.safeArea}" aria-label="第 ${slide.index} 页">
+  return `    <section class="slide layout-${slide.layout}" id="${escapeAttribute(slide.id)}" data-slide-id="${escapeAttribute(slide.id)}" data-slide-index="${slide.index}" data-slide-state="${slide.index === 1 ? "active" : "after"}" data-layout="${slide.layout}" data-safe-area="${theme.manifest.canvas.safeArea}" aria-label="第 ${slide.index} 页" aria-hidden="${slide.index === 1 ? "false" : "true"}">
+      <div class="slide-decorations" aria-hidden="true">${SLIDE_DECORATIONS_HTML}</div>
+      <div class="meteor-field" aria-hidden="true"></div>
       <div class="slide-inner">${content}</div>
       <span class="slide-number" aria-hidden="true">${String(slide.index).padStart(2, "0")}</span>
     </section>`
@@ -209,11 +213,232 @@ function sourceLine(block: Block): string {
 
 const RUNTIME_SCRIPT = `
 (() => {
-  const resize = () => {
-    const scale = Math.min(window.innerWidth / 1280, window.innerHeight / 720);
-    document.documentElement.style.setProperty('--hp-preview-scale', String(Math.max(scale, 0.1)));
+  const root = document.documentElement;
+  const deck = document.querySelector('.deck');
+  const slides = Array.from(document.querySelectorAll('.slide'));
+  const mode = new URLSearchParams(window.location.search).get('mode') === 'render' ? 'render' : 'presentation';
+  root.dataset.hpRuntime = 'ready';
+  root.dataset.hpMode = mode;
+  let currentIndex = 0;
+  let wheelTotal = 0;
+  let wheelDirection = 0;
+  let wheelTriggered = false;
+  let wheelLastAt = 0;
+  let wheelTailFloor = Number.POSITIVE_INFINITY;
+  let wheelTimer;
+  let touchStartX = 0;
+  let touchStartY = 0;
+  let restartMeteorMotion = () => {};
+
+  const hashSlideIndex = () => {
+    if (!window.location.hash) return 0;
+    let id = window.location.hash.slice(1);
+    try { id = decodeURIComponent(id); } catch {}
+    const index = slides.findIndex((slide) => slide.id === id);
+    return index >= 0 ? index : 0;
   };
+
+  const updateSlides = (nextIndex, updateHash = true) => {
+    if (mode !== 'presentation' || slides.length === 0) return;
+    const boundedIndex = Math.max(0, Math.min(nextIndex, slides.length - 1));
+    const changed = boundedIndex !== currentIndex;
+    if (changed) deck?.setAttribute('data-navigation', boundedIndex > currentIndex ? 'forward' : 'backward');
+    currentIndex = boundedIndex;
+    slides.forEach((slide, index) => {
+      const state = index === currentIndex ? 'active' : index < currentIndex ? 'before' : 'after';
+      slide.dataset.slideState = state;
+      slide.setAttribute('aria-hidden', state === 'active' ? 'false' : 'true');
+      if (state === 'active') slide.setAttribute('aria-current', 'page');
+      else slide.removeAttribute('aria-current');
+    });
+    deck?.setAttribute('data-current-slide', String(currentIndex + 1));
+    if (updateHash) window.history.replaceState(null, '', '#' + encodeURIComponent(slides[currentIndex].id));
+    if (changed) restartMeteorMotion();
+  };
+
+  const resize = () => {
+    const scale = mode === 'presentation' ? Math.min(window.innerWidth / 1280, window.innerHeight / 720) : 1;
+    root.style.setProperty('--hp-preview-scale', String(Math.max(scale, 0.1)));
+  };
+
+  const navigate = (delta) => updateSlides(currentIndex + delta);
+  const resetWheelGesture = (direction = 0) => {
+    wheelTotal = 0;
+    wheelDirection = direction;
+    wheelTriggered = false;
+    wheelTailFloor = Number.POSITIVE_INFINITY;
+  };
+  const editableTarget = (target) => target instanceof Element && Boolean(target.closest('input,textarea,select,button,a,[contenteditable="true"]'));
+  const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+  const cosmicPresentation = mode === 'presentation' && document.body.dataset.theme === 'cosmic-mint';
+  let meteorTimer;
+  let meteorWave = 0;
+  let randomState = 0;
+
+  const seedMotionRandom = () => {
+    if (randomState !== 0) return;
+    const seed = new Uint32Array(1);
+    window.crypto.getRandomValues(seed);
+    randomState = seed[0] || 0x6d2b79f5;
+    root.dataset.hpMotionSeed = String(randomState >>> 0);
+  };
+
+  const motionRandom = () => {
+    randomState ^= randomState << 13;
+    randomState ^= randomState >>> 17;
+    randomState ^= randomState << 5;
+    return (randomState >>> 0) / 4294967296;
+  };
+
+  const clearMeteorMotion = () => {
+    window.clearTimeout(meteorTimer);
+    meteorTimer = undefined;
+    slides.forEach((slide) => {
+      slide.querySelectorAll('.hp-meteor').forEach((meteor) => {
+        meteor.getAnimations().forEach((animation) => animation.cancel());
+        meteor.remove();
+      });
+    });
+  };
+
+  const scheduleMeteorWave = (initial = false) => {
+    if (!cosmicPresentation || reducedMotion.matches) return;
+    const delay = initial ? 420 + motionRandom() * 580 : 3800 + motionRandom() * 5200;
+    if (deck) deck.dataset.meteorNextDelay = String(Math.round(delay));
+    meteorTimer = window.setTimeout(spawnMeteorWave, delay);
+  };
+
+  const spawnMeteorWave = () => {
+    if (!cosmicPresentation || reducedMotion.matches) return;
+    const slide = slides[currentIndex];
+    const field = slide?.querySelector('.meteor-field');
+    if (!(field instanceof HTMLElement)) return;
+    field.replaceChildren();
+    meteorWave += 1;
+    const count = 1 + Math.floor(motionRandom() * 3);
+    if (deck) {
+      deck.dataset.meteorWave = String(meteorWave);
+      deck.dataset.meteorWaveCount = String(count);
+    }
+    field.dataset.wave = String(meteorWave);
+    field.dataset.waveCount = String(count);
+    for (let index = 0; index < count; index += 1) {
+      const startX = -8 - motionRandom() * 22;
+      const startY = Math.min(500, 132 + motionRandom() * 300 + index * 22);
+      const endX = Math.min(840, 340 + (startY - 132) * 1.08 + motionRandom() * 120);
+      const endY = -18 - motionRandom() * 28;
+      const dx = endX - startX;
+      const dy = endY - startY;
+      const angle = Math.atan2(dy, dx) * 180 / Math.PI;
+      const length = 130 + motionRandom() * 170;
+      const duration = 1900 + motionRandom() * 700;
+      const delay = index * (110 + motionRandom() * 190);
+      const meteor = document.createElement('i');
+      meteor.className = 'hp-meteor';
+      meteor.style.left = String(startX - length) + 'px';
+      meteor.style.top = String(startY) + 'px';
+      meteor.style.width = String(length) + 'px';
+      meteor.style.rotate = String(angle) + 'deg';
+      meteor.dataset.wave = String(meteorWave);
+      meteor.dataset.path = [startX, startY, endX, endY].map((value) => Math.round(value)).join(',');
+      meteor.dataset.duration = String(Math.round(duration));
+      field.append(meteor);
+      meteor.animate([
+        { offset: 0, translate: '0px 0px', scale: '.18 1', opacity: 0 },
+        { offset: .12, translate: String(dx * .12) + 'px ' + String(dy * .12) + 'px', scale: '.42 1', opacity: .2 },
+        { offset: .34, translate: String(dx * .34) + 'px ' + String(dy * .34) + 'px', scale: '1 1', opacity: .96 },
+        { offset: .78, translate: String(dx * .78) + 'px ' + String(dy * .78) + 'px', scale: '.88 1', opacity: .74 },
+        { offset: 1, translate: String(dx) + 'px ' + String(dy) + 'px', scale: '.52 1', opacity: 0 },
+      ], { duration, delay, easing: 'linear', fill: 'both' });
+    }
+    scheduleMeteorWave(false);
+  };
+
+  restartMeteorMotion = () => {
+    clearMeteorMotion();
+    if (!cosmicPresentation || reducedMotion.matches) return;
+    seedMotionRandom();
+    scheduleMeteorWave(true);
+  };
+
+  reducedMotion.addEventListener('change', () => restartMeteorMotion());
+
   window.addEventListener('resize', resize);
+  if (mode === 'presentation') {
+    updateSlides(hashSlideIndex());
+    window.addEventListener('hashchange', () => updateSlides(hashSlideIndex()));
+    window.addEventListener('keydown', (event) => {
+      if (editableTarget(event.target)) return;
+      const forward = ['ArrowRight', 'ArrowDown', 'PageDown'];
+      const backward = ['ArrowLeft', 'ArrowUp', 'PageUp'];
+      if (forward.includes(event.key) || (event.key === ' ' && !event.shiftKey)) {
+        event.preventDefault();
+        navigate(1);
+      } else if (backward.includes(event.key) || (event.key === ' ' && event.shiftKey)) {
+        event.preventDefault();
+        navigate(-1);
+      } else if (event.key === 'Home') {
+        event.preventDefault();
+        updateSlides(0);
+      } else if (event.key === 'End') {
+        event.preventDefault();
+        updateSlides(slides.length - 1);
+      }
+    });
+    window.addEventListener('wheel', (event) => {
+      event.preventDefault();
+      const delta = Math.abs(event.deltaY) >= Math.abs(event.deltaX) ? event.deltaY : event.deltaX;
+      if (delta === 0) return;
+      const direction = Math.sign(delta);
+      const magnitude = Math.abs(delta);
+      const now = performance.now();
+      const eventGap = wheelLastAt === 0 ? Number.POSITIVE_INFINITY : now - wheelLastAt;
+      const reversed = wheelDirection !== 0 && direction !== wheelDirection;
+      const acceleratedAfterTail = wheelTriggered
+        && wheelTailFloor <= 10
+        && magnitude >= Math.max(14, wheelTailFloor * 2.4);
+      const restarted = wheelTriggered && !reversed && (eventGap >= 56 || acceleratedAfterTail);
+      if (reversed || restarted) resetWheelGesture(direction);
+      else if (wheelDirection === 0) wheelDirection = direction;
+      wheelLastAt = now;
+      window.clearTimeout(wheelTimer);
+      wheelTimer = window.setTimeout(() => {
+        resetWheelGesture();
+        wheelLastAt = 0;
+      }, 120);
+      if (wheelTriggered) {
+        wheelTailFloor = Math.min(wheelTailFloor, magnitude);
+        return;
+      }
+      wheelTotal += delta;
+      if (Math.abs(wheelTotal) >= 24) {
+        navigate(wheelTotal > 0 ? 1 : -1);
+        wheelTotal = 0;
+        wheelTriggered = true;
+        wheelTailFloor = Number.POSITIVE_INFINITY;
+      }
+    }, { passive: false });
+    window.addEventListener('touchstart', (event) => {
+      const touch = event.changedTouches[0];
+      if (!touch) return;
+      touchStartX = touch.clientX;
+      touchStartY = touch.clientY;
+    }, { passive: true });
+    window.addEventListener('touchend', (event) => {
+      const touch = event.changedTouches[0];
+      if (!touch) return;
+      const dx = touch.clientX - touchStartX;
+      const dy = touch.clientY - touchStartY;
+      const distance = Math.abs(dx) >= Math.abs(dy) ? dx : dy;
+      if (Math.abs(distance) >= 60) navigate(distance < 0 ? 1 : -1);
+    }, { passive: true });
+  } else {
+    slides.forEach((slide) => {
+      slide.dataset.slideState = 'active';
+      slide.setAttribute('aria-hidden', 'false');
+    });
+  }
+  restartMeteorMotion();
   resize();
   Promise.all([
     document.fonts.ready,
@@ -227,10 +452,12 @@ const RUNTIME_SCRIPT = `
 const BASE_CSS = `
 * { box-sizing: border-box; }
 :root { --hp-preview-scale: 1; }
-html, body { margin: 0; min-height: 100%; background: #101114; }
+html, body { margin: 0; width: 100%; min-height: 100%; background: var(--hp-stage-background, var(--hp-color-background, #101114)); }
 body { font-family: var(--hp-font-body); color: var(--hp-color-text); }
 .deck { display: grid; gap: 32px; justify-content: center; padding: 32px; }
 .slide { position: relative; width: 1280px; height: 720px; overflow: hidden; background: var(--hp-color-background); color: var(--hp-color-text); box-shadow: 0 18px 70px rgba(0,0,0,.28); }
+.slide-decorations { display: none; }
+.meteor-field { display: none; }
 .slide-inner { position: absolute; inset: 0; padding: var(--hp-safe-area, 64px); display: flex; flex-direction: column; gap: calc(var(--hp-spacing-unit) * 3); }
 .slide-title { margin: 0; font-family: var(--hp-font-heading); font-size: 48px; line-height: 1.08; font-weight: 760; letter-spacing: -.035em; }
 .slide-number { position: absolute; right: 30px; bottom: 22px; font: 600 13px/1 var(--hp-font-body); color: var(--hp-color-muted); letter-spacing: .12em; }
@@ -280,12 +507,25 @@ blockquote p { font: inherit; }
 .full-bleed-overlay .slide-title { font-size: 68px; }
 .inline-image-alt { padding: .1em .35em; border-radius: .25em; background: var(--hp-color-surface); color: var(--hp-color-muted); }
 @media screen {
-  .slide { transform: scale(var(--hp-preview-scale)); transform-origin: top center; margin-bottom: calc((720px * var(--hp-preview-scale)) - 720px); }
+  html[data-hp-runtime="ready"][data-hp-mode="presentation"],
+  html[data-hp-runtime="ready"][data-hp-mode="presentation"] body { height: 100%; overflow: hidden; }
+  html[data-hp-mode="presentation"] .deck { position: relative; display: block; width: 100vw; height: 100vh; padding: 0; overflow: hidden; background: var(--hp-stage-background, var(--hp-color-background)); }
+  html[data-hp-mode="presentation"] .slide { position: absolute; left: 50%; top: 50%; margin: 0; opacity: 0; visibility: hidden; pointer-events: none; translate: 34px 0; transform: translate(-50%, -50%) scale(var(--hp-preview-scale)); transform-origin: center; }
+  html[data-hp-mode="presentation"] .slide[data-slide-state="before"] { translate: -34px 0; }
+  html[data-hp-mode="presentation"] .slide[data-slide-state="active"] { z-index: 1; opacity: 1; visibility: visible; pointer-events: auto; translate: 0px 0px; }
+  html[data-hp-mode="presentation"] .deck[data-navigation="forward"] .slide[data-slide-state="active"] { animation: hp-slide-enter-forward 340ms cubic-bezier(.22,.61,.36,1) both; }
+  html[data-hp-mode="presentation"] .deck[data-navigation="backward"] .slide[data-slide-state="active"] { animation: hp-slide-enter-backward 340ms cubic-bezier(.22,.61,.36,1) both; }
+  html[data-hp-mode="render"] .slide { animation: none; translate: none; transform: none; }
+}
+@keyframes hp-slide-enter-forward { from { opacity: 0; translate: 34px 0; } to { opacity: 1; translate: 0px 0px; } }
+@keyframes hp-slide-enter-backward { from { opacity: 0; translate: -34px 0; } to { opacity: 1; translate: 0px 0px; } }
+@media (prefers-reduced-motion: reduce) {
+  html[data-hp-mode="presentation"] .slide { animation: none !important; }
 }
 @media print {
   @page { size: 13.333in 7.5in; margin: 0; }
-  html, body { width: 13.333in; background: transparent; print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+  html, body { width: 13.333in; height: auto; overflow: visible; background: transparent; print-color-adjust: exact; -webkit-print-color-adjust: exact; }
   .deck { display: block; padding: 0; }
-  .slide { width: 13.333in; height: 7.5in; box-shadow: none; break-after: page; page-break-after: always; }
+  .slide { position: relative; left: auto; top: auto; width: 13.333in; height: 7.5in; opacity: 1; visibility: visible; pointer-events: auto; animation: none; translate: none; transform: none; box-shadow: none; break-after: page; page-break-after: always; }
   .slide:last-child { break-after: auto; page-break-after: auto; }
 }`

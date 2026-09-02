@@ -46,12 +46,12 @@ test("cosmic-mint Style Spec 区分观察、推断和未决项", async () => {
     forbidden: string[]
     revisionReview: { total: number; gate: string }
   }
-  assert.equal(spec.version, "0.1.2")
+  assert.equal(spec.version, "0.1.5")
   assert.equal(spec.source.license, "local-analysis-only")
   assert.equal(spec.source.publication, false)
   assert.deepEqual([spec.source.width, spec.source.height], [2118, 1112])
   assert.match(spec.source.sha256, /^[\da-f]{64}$/)
-  assert.equal(spec.source.reviewEvidence.length, 6)
+  assert.equal(spec.source.reviewEvidence.length, 10)
   for (const evidence of spec.source.reviewEvidence) {
     assert.equal(evidence.publication, false)
     assert.match(evidence.sha256, /^[\da-f]{64}$/)
@@ -65,7 +65,7 @@ test("cosmic-mint Style Spec 区分观察、推断和未决项", async () => {
   assert.equal(spec.unresolved.length > 0, true)
   assert.equal(spec.forbidden.length > 0, true)
   assert.equal(spec.revisionReview.total >= 25, true)
-  assert.equal(spec.revisionReview.gate, "pass-for-user-rereview")
+  assert.equal(spec.revisionReview.gate, "accepted-by-user")
   try {
     const reference = await readFile(path.join(themeRoot, spec.source.reference))
     assert.equal(sha256(reference), spec.source.sha256)

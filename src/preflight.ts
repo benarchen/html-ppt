@@ -106,7 +106,7 @@ export async function runPreflight(
       fontFamilies: [...new Set(Object.values(manifest.typography).map((role) => role.family))],
     }
     return makeReport(path.basename(htmlPath), findings.slideCount, findings.issues, diagnostics, options.strict ?? false, runtime)
-  })
+  }, { mode: "render" })
   if (options.reportPath) await writeFile(options.reportPath, `${JSON.stringify(report, null, 2)}\n`, { encoding: "utf8", flag: "wx" })
   return report
 }

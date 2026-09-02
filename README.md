@@ -4,7 +4,7 @@
 
 公开仓库：https://github.com/benarchen/html-ppt
 
-当前基线版本：`v0.1.0`。
+当前公开基线版本：`v0.3.0`。
 
 ## 当前能力
 
@@ -13,6 +13,7 @@
 - 提供 `base-light`、`editorial-dark` 与 `cosmic-mint` 三套主题。
 - 支持 12 种标准布局与确定性内容拆页。
 - 生成可离线打开的静态 HTML。
+- 默认 HTML 以逐页演示模式打开，支持键盘、滚轮／触控板和 URL hash 深链接。
 - 提供本地预览与源文件／主题热重载。
 - 通过 Chromium 执行 Preflight、PDF 与逐页 PNG 导出。
 - 输出机器可读检查报告和 PNG contact sheet。
@@ -72,6 +73,18 @@ PLAYWRIGHT_BROWSERS_PATH=0 npm run html-ppt -- check examples/specimen.md \
 
 输出目录不能预先存在，工具不会覆盖已有产物。`export` 先写入带 `.partial-*` 标识的工作目录，全部步骤成功后才原子重命名，并写入 `delivery.json` 完成标记。
 
+## 演示播放
+
+直接打开生成目录中的 `index.html` 即进入逐页演示模式，同一时刻只显示一页，页面不会形成连续纵向长文档。16∶9 视口会贴合四边，超宽或 4∶3 视口使用当前主题的舞台背景承接剩余区域，逻辑画布始终保持 1280 × 720，不拉伸、不裁切。
+
+- 下一页：`ArrowRight`、`ArrowDown`、`PageDown`、`Space`、向下或向右滚动。
+- 上一页：`ArrowLeft`、`ArrowUp`、`PageUp`、`Shift+Space`、向上或向左滚动。
+- 首尾页：`Home`、`End`。
+- 触控：在主要方向滑动至少 60px。
+- 深链接：当前页面写入 URL hash，例如 `#slide-04`；合法 hash 会在刷新后恢复，无效 hash 回退到第一页。
+
+系统启用“减少动态效果”时，页面立即切换，主题背景动画冻结。`?mode=render` 是 Preflight、PDF、PNG 和自动化测试使用的全页渲染入口，不作为日常播放方式。
+
 ## 输出结构
 
 ```text
@@ -96,7 +109,7 @@ output/my-deck-export/
 
 同一份 Markdown 可以通过 `--theme` 切换主题，无需修改内容。新主题从 `themes/_template/` 开始，先完成 Style Spec，再实现 token、组件和全部布局 specimen。
 
-`cosmic-mint` 是首套由用户参考图提取并验收的正式主题，当前版本为 `0.1.2`。它使用颗粒化斜向银河、分层星空、右侧缓慢转动的陆地点阵地球和双流星构成背景；海洋区域不铺点阵，打印与减少动态效果环境会自动冻结为稳定静态帧。参考原图仅限本地分析且不会进入公开仓库；主题包只保留脱敏的 Style Spec、可复用 token、CSS 设计规则和代码生成的 SVG 资产。
+`cosmic-mint` 是首套由用户参考图提取并完成验收的正式主题，当前版本为 `0.1.5`。它使用铺满演示舞台的颗粒化斜向银河、15 颗独立闪光并小范围漂移的圆点主星、右侧缓慢转动的陆地点阵地球，以及每波随机出现 1～3 颗、从左边缘进入并沿上半区从上边缘离开的流星构成背景；海洋区域不铺点阵，打印、全页渲染与减少动态效果环境不会启动随机流星调度。参考原图仅限本地分析且不会进入公开仓库；主题包只保留脱敏的 Style Spec、可复用 token、CSS 设计规则和代码生成的 SVG 资产。
 
 ```bash
 npm run html-ppt -- build themes/cosmic-mint/specimen.md \
@@ -141,6 +154,8 @@ npm run test:visual
 - [依赖说明](docs/dependencies.md)
 - [v0.1 交付报告](docs/delivery-v0.1.md)
 - [Goal 002 交付报告](docs/delivery-goal-002.md)
+- [Goal 003 交付报告](docs/delivery-goal-003.md)
 - [施工 Goal](goals/001-v0.1-mvp.md)
 - [Goal 002 施工清单](goals/002-reference-theme-real-deck.md)
+- [Goal 003 施工清单](goals/003-presentation-player-and-cosmic-motion.md)
 - [项目路线图](ROADMAP.md)

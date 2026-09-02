@@ -1,6 +1,6 @@
 {
   "name": "cosmic-mint",
-  "version": "0.1.2",
+  "version": "0.1.5",
   "extractedAt": "2026-08-31",
   "source": {
     "type": "reference-image",
@@ -23,6 +23,50 @@
         "height": 854,
         "sha256": "5c962c87bb1b617dae19af9848b5a95fc669c6696458d29dc664f82a0b33a676",
         "note": "The red rectangle marks a meteor trail; the annotation itself and capture UI are excluded from the theme."
+      },
+      {
+        "reference": "references/feedback-round3-stage-meteor-stars.png",
+        "origin": "user-provided third-round annotated review screenshot; the same PNG was uploaded twice",
+        "license": "local-analysis-only",
+        "publication": false,
+        "format": "png",
+        "width": 3408,
+        "height": 1732,
+        "sha256": "8d85dff4d9d9735e9bf2c1fd9e4d0ed4725b779d01e90122eec070ce76fc1875",
+        "note": "Confirms solid side-stage fills still read as blank bars, fixed paired meteor cycles and paths feel artificial, and grouped star opacity changes are not visibly perceived as twinkling."
+      },
+      {
+        "reference": "references/feedback-round4-card-fit.png",
+        "origin": "user-provided fourth-round annotated review screenshot",
+        "license": "local-analysis-only",
+        "publication": false,
+        "format": "png",
+        "width": 2958,
+        "height": 1516,
+        "sha256": "ed4ca7adbe4f0fe65eb0b62ca5ee78530303bb24519e322b24e511eccc5c40bf",
+        "note": "Rejects two-column cards that stretch to fill the remaining slide height when their text content is short."
+      },
+      {
+        "reference": "references/feedback-round4-meteor-navigation.png",
+        "origin": "user-provided fourth-round browser screenshot with trajectory annotations",
+        "license": "local-analysis-only",
+        "publication": false,
+        "format": "png",
+        "width": 3644,
+        "height": 2214,
+        "sha256": "1d1a6ef7f0dd5edcea87bf42a3d6c260e4e430b1be0c811a1590026e9d8aa819",
+        "note": "Freezes the meteor region above the main diagonal: enter through the left edge, travel smoothly toward the upper right, exit through the top edge, and move more slowly than 0.1.4. It also records unreliable repeated trackpad gestures."
+      },
+      {
+        "reference": "references/feedback-round4-cross-star.png",
+        "origin": "user-provided fourth-round star-shape crop",
+        "license": "local-analysis-only",
+        "publication": false,
+        "format": "png",
+        "width": 362,
+        "height": 208,
+        "sha256": "e98406ad9e8b86eb2292b67d0941b8dcfe7243dcddd647453021ef313b2d571f",
+        "note": "Explicitly rejects cross-shaped stars with horizontal and vertical rays; all primary stars must remain circular dots."
       },
       {
         "reference": "references/feedback-earth-01.png",
@@ -123,9 +167,9 @@
       "extension": "Rebuild the atmosphere with deterministic local SVG textures and CSS pseudo-elements; do not copy the source artwork."
     },
     "motion": {
-      "fact": "The user supplied three Earth frames that confirm slow rotation and a separate meteor reference showing two thin staggered trails crossing at irregular intervals.",
-      "treatment": "Use a 48-second continuous continent-strip drift and non-synchronised 5.8–7.6-second two-trail meteor cycles across slides. Freeze both at a stable representative frame for print and reduced-motion users.",
-      "fallback": "The static frame must still show a readable continent-only dotted Earth and two restrained meteor trails."
+      "fact": "The user supplied three Earth frames that confirm slow rotation, a meteor reference showing thin staggered trails, a third-round review rejecting fixed meteor waves, and a fourth-round review that freezes left-edge-to-top-edge meteor geometry, slower travel, circular stars, and reliable gesture navigation.",
+      "treatment": "Use a 48-second continuous continent-strip drift; fifteen circular stars with independent twinkle peaks, glows, delays, and 4–12px firefly-like drift; and session-seeded irregular waves of one to three smooth meteors that enter through the left edge, remain in the upper half above the main diagonal, and leave through the top edge over 1.9–2.6 seconds. Extend the same galaxy and sparse-light language across non-16:9 stage margins. Freeze or omit transient motion for print, render mode, and reduced-motion users.",
+      "fallback": "The static frame must show a readable continent-only dotted Earth and sparse stars without depending on a captured random meteor state."
     },
     "chartStyle": {
       "fact": "The reference does not show a chart.",
@@ -159,8 +203,8 @@
     },
     {
       "id": "meteor-motion",
-      "decision": "Animate two thin staggered luminous trails from upper-right to lower-left with three offset duration and delay groups.",
-      "rationale": "The close reference shows a paired trail treatment, and the user requested a slightly faster crossing speed while preserving irregular timing.",
+      "decision": "Generate irregular waves of one to three thin luminous trails using a crypto-seeded per-session PRNG; each trail enters through the left edge, crosses the upper half above the main diagonal, and leaves through the top edge over 1.9–2.6 seconds while staying left of the Earth.",
+      "rationale": "The fourth-round annotation explicitly freezes the start and exit edges, desired upper-half region, and slower speed while retaining varied smooth trajectories.",
       "confidence": "high"
     },
     {
@@ -192,7 +236,7 @@
     { "area": "charts", "reason": "No chart or data visualization is visible." },
     { "area": "photography", "reason": "No content photograph or crop behavior is visible." },
     { "area": "light-background-variant", "reason": "The reference only demonstrates a dark presentation." },
-    { "area": "meteor-frequency", "reason": "The user confirmed irregular motion and two visible trails but did not specify an exact random distribution." }
+    { "area": "meteor-frequency", "reason": "The user requires one to three meteors per wave with irregular timing but leaves the exact probability distribution to implementation and visual review." }
   ],
   "forbidden": [
     "copying the reference raster background into the theme",
@@ -228,10 +272,34 @@
       "total": 25,
       "outcome": "rejected-by-user",
       "reason": "The Earth used uniform full-sphere dots, the galaxy read as a color block, and the meteor treatment did not match the paired thin trails."
+    },
+    {
+      "version": "0.1.2",
+      "total": 26,
+      "outcome": "accepted-by-user",
+      "reason": "The user accepted the continent-only dotted Earth, granular Milky Way texture, and paired meteor treatment before requesting a later player and motion refinement."
+    },
+    {
+      "version": "0.1.3",
+      "total": 26,
+      "outcome": "rejected-by-user",
+      "reason": "The solid side stage still read as blank bars, the fixed paired meteor period and path felt artificial, and grouped star animation did not produce visible twinkling."
+    },
+    {
+      "version": "0.1.4",
+      "total": 26,
+      "outcome": "rejected-by-user",
+      "reason": "Two-column cards still stretched vertically, meteors crossed the middle too quickly instead of entering from the left and leaving through the top, some stars rendered as crosses, and the fixed wheel cooldown swallowed subsequent trackpad gestures."
+    },
+    {
+      "version": "0.1.5",
+      "total": 26,
+      "outcome": "accepted-by-user",
+      "reason": "The user accepted the final Goal 003 delivery after G11 fixed repeated same-direction trackpad gestures while retaining content-sized cards, circular stars, and 1.9–2.6-second upper-half meteors."
     }
   ],
   "revisionReview": {
-    "reviewer": "implementation self-review after second user feedback",
+    "reviewer": "user acceptance after Goal 003 G11",
     "scale": "1-5",
     "scores": {
       "colorLanguage": 5,
@@ -242,7 +310,7 @@
       "imageAndDecoration": 5
     },
     "total": 26,
-    "gate": "pass-for-user-rereview",
-    "note": "Revision replaces the rejected uniform-dot globe and smooth galaxy block with continent-only dots, granular Milky Way texture, and paired faster meteor trails; final acceptance remains with the user."
+    "gate": "accepted-by-user",
+    "note": "The user verified and accepted the final 0.1.5 visual system and Goal 003 G11 navigation behavior on 2026-09-02."
   }
 }

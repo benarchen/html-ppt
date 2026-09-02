@@ -17,7 +17,7 @@ export async function exportPdf(htmlPath: string, outputPath: string): Promise<n
       preferCSSPageSize: true,
       tagged: true,
     })
-  })
+  }, { mode: "render" })
   const pageCount = (buffer.toString("latin1").match(/\/Type\s*\/Page\b/g) ?? []).length
   if (pageCount === 0) throw new HtmlPptError("EXPORT_PDF_PAGES", "Chromium 生成的 PDF 不包含可识别页面", { file: outputPath })
   await writeFile(outputPath, buffer, { flag: "wx" })
@@ -41,7 +41,7 @@ export async function exportPng(htmlPath: string, outputDirectory: string): Prom
       files.push(file)
     }
     return files
-  })
+  }, { mode: "render" })
 }
 
 export async function exportContactSheet(outputDirectory: string, pngFiles: string[], title: string): Promise<string> {

@@ -74,61 +74,285 @@ test("浏览器窗口变化只缩放固定逻辑画布", async () => {
   })
 })
 
-test("cosmic-mint 背景包含旋转地球、非同步流星和静态降级", async () => {
-  const temp = await mkdtemp(path.join(os.tmpdir(), "html-ppt-cosmic-motion-test-"))
+test("默认 HTML 使用主题化舞台逐页播放并支持稳定导航", async () => {
+  const temp = await mkdtemp(path.join(os.tmpdir(), "html-ppt-player-test-"))
   const compiled = await compileDeck({ projectRoot: root, inputPath: input, themeName: "cosmic-mint" })
   const build = await writeBuild(compiled, path.join(temp, "artifact"), temp)
   await withRenderedPage(build.htmlPath, 1, async (page) => {
+    await page.setViewportSize({ width: 3404, height: 1728 })
+    await page.waitForFunction(() => getComputedStyle(document.documentElement).getPropertyValue("--hp-preview-scale").trim() === "2.4")
+    const initial = await page.evaluate(() => {
+      const slides = Array.from(document.querySelectorAll<HTMLElement>(".slide"))
+      const active = slides.filter((slide) => getComputedStyle(slide).visibility === "visible")
+      const rect = active[0]?.getBoundingClientRect()
+      return {
+        mode: document.documentElement.dataset.hpMode,
+        activeCount: active.length,
+        current: document.querySelector(".deck")?.getAttribute("data-current-slide"),
+        hash: decodeURIComponent(window.location.hash.slice(1)),
+        bodyOverflow: getComputedStyle(document.body).overflow,
+        bodyBackground: getComputedStyle(document.body).backgroundColor,
+        deckBackground: getComputedStyle(document.querySelector<HTMLElement>(".deck")!).backgroundColor,
+        deckBackgroundImage: getComputedStyle(document.querySelector<HTMLElement>(".deck")!).backgroundImage,
+        stageStarAnimation: getComputedStyle(document.querySelector<HTMLElement>(".deck")!, "::before").animationName,
+        leftEdgeElement: document.elementFromPoint(8, window.innerHeight / 2)?.className,
+        rightEdgeElement: document.elementFromPoint(window.innerWidth - 8, window.innerHeight / 2)?.className,
+        scrollHeight: document.documentElement.scrollHeight,
+        viewportHeight: window.innerHeight,
+        slide: rect ? { left: rect.left, top: rect.top, width: rect.width, height: rect.height } : null,
+      }
+    })
+    assert.equal(initial.mode, "presentation")
+    assert.equal(initial.activeCount, 1)
+    assert.equal(initial.current, "1")
+    assert.match(initial.hash, /^slide-01-/)
+    assert.equal(initial.bodyOverflow, "hidden")
+    assert.equal(initial.bodyBackground, "rgb(2, 4, 17)")
+    assert.equal(initial.deckBackground, initial.bodyBackground)
+    assert.match(initial.deckBackgroundImage, /data:image\/svg\+xml;base64/)
+    assert.equal(initial.stageStarAnimation, "hp-stage-firefly")
+    assert.equal(initial.leftEdgeElement, "deck")
+    assert.equal(initial.rightEdgeElement, "deck")
+    assert.equal(initial.scrollHeight, initial.viewportHeight)
+    assert.ok(initial.slide)
+    assert.equal(initial.slide.left, 166)
+    assert.ok(Math.abs(initial.slide.top) < .001)
+    assert.equal(initial.slide.width, 3072)
+    assert.equal(initial.slide.height, 1728)
+
+    await page.keyboard.press("ArrowRight")
+    await page.waitForFunction(() => document.querySelector(".deck")?.getAttribute("data-current-slide") === "2")
+    assert.match(decodeURIComponent(new URL(page.url()).hash.slice(1)), /^slide-02-/)
+    await page.keyboard.press("Home")
+    await page.waitForFunction(() => document.querySelector(".deck")?.getAttribute("data-current-slide") === "1")
+    await page.mouse.wheel(0, 60)
+    await page.waitForFunction(() => document.querySelector(".deck")?.getAttribute("data-current-slide") === "2")
+    await page.keyboard.press("End")
+    await page.waitForFunction(() => document.querySelector(".deck")?.getAttribute("data-current-slide") === "12")
+    await page.keyboard.press("ArrowRight")
+    assert.equal(await page.locator(".deck").getAttribute("data-current-slide"), "12")
+    assert.equal(await page.locator('.slide[aria-current="page"]').count(), 1)
+
+    await page.setViewportSize({ width: 1920, height: 1080 })
+    await page.waitForFunction(() => getComputedStyle(document.documentElement).getPropertyValue("--hp-preview-scale").trim() === "1.5")
+    await page.locator('.slide[aria-current="page"]').evaluate(async (slide) => {
+      const transitions = slide.getAnimations().filter((animation) => animation instanceof CSSAnimation && animation.animationName.startsWith("hp-slide-enter"))
+      await Promise.all(transitions.map((animation) => animation.finished))
+    })
+    const widescreen = await page.locator('.slide[aria-current="page"]').evaluate((slide) => {
+      const rect = slide.getBoundingClientRect()
+      return { left: rect.left, top: rect.top, width: rect.width, height: rect.height }
+    })
+    assert.deepEqual(widescreen, { left: 0, top: 0, width: 1920, height: 1080 })
+    assert.equal(await page.locator(".deck").getAttribute("data-current-slide"), "12")
+
+    await page.setViewportSize({ width: 1024, height: 768 })
+    await page.waitForFunction(() => getComputedStyle(document.documentElement).getPropertyValue("--hp-preview-scale").trim() === "0.8")
+    const fourThree = await page.locator('.slide[aria-current="page"]').evaluate((slide) => {
+      const rect = slide.getBoundingClientRect()
+      return { left: rect.left, top: rect.top, width: rect.width, height: rect.height }
+    })
+    assert.deepEqual(fourThree, { left: 0, top: 96, width: 1024, height: 576 })
+    assert.equal(await page.locator(".deck").getAttribute("data-current-slide"), "12")
+
+    await page.evaluate(() => { window.location.hash = "missing-slide" })
+    await page.waitForFunction(() => document.querySelector(".deck")?.getAttribute("data-current-slide") === "1")
+    assert.match(decodeURIComponent(new URL(page.url()).hash.slice(1)), /^slide-01-/)
+    await page.evaluate(() => { window.location.hash = document.querySelectorAll<HTMLElement>(".slide")[2]!.id })
+    await page.waitForFunction(() => document.querySelector(".deck")?.getAttribute("data-current-slide") === "3")
+    await page.evaluate(() => {
+      for (let index = 0; index < 4; index += 1) window.dispatchEvent(new WheelEvent("wheel", { deltaY: 8, cancelable: true }))
+    })
+    assert.equal(await page.locator(".deck").getAttribute("data-current-slide"), "4")
+    await page.evaluate(() => {
+      for (const deltaY of [7, 5, 3, 2, 1]) {
+        window.dispatchEvent(new WheelEvent("wheel", { deltaY, cancelable: true }))
+      }
+    })
+    assert.equal(await page.locator(".deck").getAttribute("data-current-slide"), "4")
+    await page.waitForTimeout(130)
+    await page.mouse.wheel(0, 32)
+    assert.equal(await page.locator(".deck").getAttribute("data-current-slide"), "5")
+    await page.evaluate(() => {
+      for (const deltaY of [-32, -24, -16, -8, -4, -2]) {
+        window.dispatchEvent(new WheelEvent("wheel", { deltaY, cancelable: true }))
+      }
+    })
+    assert.equal(await page.locator(".deck").getAttribute("data-current-slide"), "4")
+    await page.waitForTimeout(130)
+    await page.mouse.wheel(0, 40)
+    assert.equal(await page.locator(".deck").getAttribute("data-current-slide"), "5")
+
+    await page.waitForTimeout(130)
+    await page.evaluate(() => {
+      for (const deltaY of [12, 12, 12, 8, 4, 2, 3, 8, 18, 24]) {
+        window.dispatchEvent(new WheelEvent("wheel", { deltaY, cancelable: true }))
+      }
+    })
+    assert.equal(await page.locator(".deck").getAttribute("data-current-slide"), "7")
+    await page.evaluate(() => {
+      for (const deltaY of [-12, -12, -12, -8, -4, -2, -3, -8, -18, -24]) {
+        window.dispatchEvent(new WheelEvent("wheel", { deltaY, cancelable: true }))
+      }
+    })
+    assert.equal(await page.locator(".deck").getAttribute("data-current-slide"), "5")
+    await page.waitForTimeout(65)
+    await page.mouse.wheel(0, 24)
+    assert.equal(await page.locator(".deck").getAttribute("data-current-slide"), "6")
+    await page.mouse.wheel(0, -24)
+    assert.equal(await page.locator(".deck").getAttribute("data-current-slide"), "5")
+    assert.equal(await page.locator('.slide[aria-current="page"]').count(), 1)
+
+    await page.emulateMedia({ reducedMotion: "reduce" })
+    assert.equal(await page.locator(".slide").first().evaluate((slide) => getComputedStyle(slide).animationName), "none")
+  })
+
+  await withRenderedPage(build.htmlPath, 1, async (page) => {
+    const slides = page.locator(".slide")
+    assert.equal(await slides.count(), 12)
+    assert.equal(await slides.evaluateAll((items) => items.every((slide) => getComputedStyle(slide).visibility === "visible")), true)
+    assert.equal(await page.evaluate(() => document.documentElement.dataset.hpMode), "render")
+    const cardLayouts = await page.locator(".layout-two-column, .layout-comparison").evaluateAll((items) => items.map((slide) => {
+      const columns = slide.querySelector<HTMLElement>(".columns")!
+      const cards = Array.from(columns.querySelectorAll<HTMLElement>(".column"))
+      const columnsHeight = columns.getBoundingClientRect().height
+      return {
+        flexGrow: getComputedStyle(columns).flexGrow,
+        columnsHeight,
+        cardHeights: cards.map((card) => card.getBoundingClientRect().height),
+        cardsFit: cards.every((card) => card.scrollHeight <= card.clientHeight),
+      }
+    }))
+    assert.equal(cardLayouts.length >= 2, true)
+    assert.equal(cardLayouts.every((layout) => layout.flexGrow === "0"), true)
+    assert.equal(cardLayouts.every((layout) => layout.columnsHeight < 360), true)
+    assert.equal(cardLayouts.every((layout) => layout.cardHeights.every((height) => Math.abs(height - layout.columnsHeight) <= 1)), true)
+    assert.equal(cardLayouts.every((layout) => layout.cardsFit), true)
+  }, { mode: "render" })
+})
+
+test("cosmic-mint 背景包含独立星光、随机多流星和静态降级", async () => {
+  const temp = await mkdtemp(path.join(os.tmpdir(), "html-ppt-cosmic-motion-test-"))
+  const compiled = await compileDeck({ projectRoot: root, inputPath: input, themeName: "cosmic-mint" })
+  const build = await writeBuild(compiled, path.join(temp, "artifact"), temp)
+  assert.doesNotMatch(await readFile(build.htmlPath, "utf8"), /Math\.random/)
+  await withRenderedPage(build.htmlPath, 1, async (page) => {
     const slides = page.locator(".slide")
     const running = await slides.first().evaluate((slide) => {
+      const deck = document.querySelector<HTMLElement>(".deck")!
       const earth = getComputedStyle(slide, "::before")
-      const meteor = getComputedStyle(slide, "::after")
+      const stars = Array.from(slide.querySelectorAll<HTMLElement>(".hp-star"))
       return {
-        galaxyBackground: getComputedStyle(slide).backgroundImage,
+        galaxyBackground: getComputedStyle(deck).backgroundImage,
+        galaxyRepeat: getComputedStyle(deck).backgroundRepeat,
+        slideBackground: getComputedStyle(slide).backgroundImage,
         earthAnimation: earth.animationName,
         earthBackground: earth.backgroundImage,
         earthDuration: earth.animationDuration,
-        meteorAnimation: meteor.animationName,
-        meteorBackground: meteor.backgroundImage,
-        meteorDuration: meteor.animationDuration,
-        meteorDelay: meteor.animationDelay,
+        stars: stars.map((star) => ({
+          animation: getComputedStyle(star).animationName,
+          duration: getComputedStyle(star).animationDuration,
+          delay: getComputedStyle(star).animationDelay,
+          radius: getComputedStyle(star).borderRadius,
+          before: getComputedStyle(star, "::before").content,
+          after: getComputedStyle(star, "::after").content,
+        })),
       }
     })
-    const secondMeteor = await slides.nth(1).evaluate((slide) => {
-      const meteor = getComputedStyle(slide, "::after")
-      return { duration: meteor.animationDuration, delay: meteor.animationDelay }
-    })
     assert.match(running.galaxyBackground, /data:image\/svg\+xml;base64/)
+    assert.equal(running.galaxyRepeat.split(", ").every((value) => value === "no-repeat"), true)
+    assert.equal(running.slideBackground, "none")
     assert.equal(running.earthAnimation, "hp-earth-turn")
     assert.equal(running.earthDuration, "48s")
     assert.match(running.earthBackground, /data:image\/svg\+xml;base64/)
-    assert.equal(running.meteorAnimation, "hp-meteor-cross")
-    assert.equal(running.meteorBackground.match(/linear-gradient/g)?.length, 2)
-    assert.equal(running.meteorDuration, "5.8s")
-    assert.notDeepEqual([running.meteorDuration, running.meteorDelay], [secondMeteor.duration, secondMeteor.delay])
+    assert.equal(running.stars.length, 15)
+    assert.equal(running.stars.every((star) => star.animation === "hp-star-firefly"), true)
+    assert.equal(new Set(running.stars.map((star) => `${star.duration}/${star.delay}`)).size, 15)
+    assert.equal(running.stars.every((star) => star.radius === "50%" && star.before === "none" && star.after === "none"), true)
 
-    const probe = await page.addStyleTag({ content: ".slide::before,.slide::after{animation-delay:0s!important;animation-duration:2s!important}" })
-    const before = await slides.first().evaluate((slide) => ({
-      earth: getComputedStyle(slide, "::before").backgroundPosition,
-      meteor: getComputedStyle(slide, "::after").transform,
-    }))
+    const probe = await page.addStyleTag({ content: ".slide::before,.hp-star{animation-delay:0s!important;animation-duration:2s!important}" })
+    const before = await slides.first().evaluate((slide) => {
+      const stars = Array.from(slide.querySelectorAll<HTMLElement>(".hp-star")).slice(0, 4)
+      return {
+        earth: getComputedStyle(slide, "::before").backgroundPosition,
+        stars: stars.map((star) => ({ opacity: Number(getComputedStyle(star).opacity), rect: star.getBoundingClientRect().toJSON() })),
+      }
+    })
     await page.waitForTimeout(350)
-    const after = await slides.first().evaluate((slide) => ({
-      earth: getComputedStyle(slide, "::before").backgroundPosition,
-      meteor: getComputedStyle(slide, "::after").transform,
-    }))
+    const after = await slides.first().evaluate((slide) => {
+      const stars = Array.from(slide.querySelectorAll<HTMLElement>(".hp-star")).slice(0, 4)
+      return {
+        earth: getComputedStyle(slide, "::before").backgroundPosition,
+        stars: stars.map((star) => ({ opacity: Number(getComputedStyle(star).opacity), rect: star.getBoundingClientRect().toJSON() })),
+      }
+    })
     assert.notEqual(after.earth, before.earth)
-    assert.notEqual(after.meteor, before.meteor)
+    assert.equal(after.stars.some((star, index) => Math.abs(star.opacity - before.stars[index]!.opacity) > .05), true)
+    assert.equal(after.stars.some((star, index) => Math.abs(star.rect.x - before.stars[index]!.rect.x) > .2 || Math.abs(star.rect.y - before.stars[index]!.rect.y) > .2), true)
     await probe.evaluate((element) => element.parentNode?.removeChild(element))
 
+    await page.waitForFunction(() => Number(document.querySelector(".deck")?.getAttribute("data-meteor-wave")) >= 1 && document.querySelectorAll('.slide[aria-current="page"] .hp-meteor').length >= 1)
+    const wave = await page.locator('.slide[aria-current="page"]').evaluate((slide) => {
+      const meteors = Array.from(slide.querySelectorAll<HTMLElement>(".hp-meteor"))
+      return {
+        seed: document.documentElement.dataset.hpMotionSeed,
+        count: Number(document.querySelector(".deck")?.getAttribute("data-meteor-wave-count")),
+        nextDelay: Number(document.querySelector(".deck")?.getAttribute("data-meteor-next-delay")),
+        meteors: meteors.map((meteor) => ({
+          path: meteor.dataset.path,
+          duration: Number(meteor.dataset.duration),
+          easing: meteor.getAnimations()[0]?.effect?.getTiming().easing,
+        })),
+      }
+    })
+    assert.match(wave.seed ?? "", /^\d+$/)
+    assert.equal(wave.count >= 1 && wave.count <= 3, true)
+    assert.equal(wave.meteors.length, wave.count)
+    assert.equal(new Set(wave.meteors.map((meteor) => meteor.path)).size, wave.count)
+    assert.equal(wave.nextDelay >= 3800 && wave.nextDelay <= 9000, true)
+    assert.equal(wave.meteors.every((meteor) => meteor.duration >= 1900 && meteor.duration <= 2600), true)
+    assert.equal(wave.meteors.every((meteor) => meteor.easing === "linear"), true)
+    assert.equal(wave.meteors.every((meteor) => {
+      const values = (meteor.path ?? "").split(",").map(Number)
+      if (values.length !== 4) return false
+      const [startX, startY, endX, endY] = values as [number, number, number, number]
+      return startX <= 0 && startY >= 132 && startY <= 500 && endX >= 340 && endX <= 840 && endY < 0
+    }), true)
+
+    const meteorBefore = await page.locator('.slide[aria-current="page"] .hp-meteor').first().evaluate((meteor) => getComputedStyle(meteor).translate)
+    await page.waitForTimeout(180)
+    const meteorAfter = await page.locator('.slide[aria-current="page"] .hp-meteor').first().evaluate((meteor) => getComputedStyle(meteor).translate)
+    const parseTranslate = (value: string): [number, number] => {
+      const parts = value === "none" ? ["0", "0"] : value.split(/\s+/)
+      return [Number.parseFloat(parts[0] ?? "0"), Number.parseFloat(parts[1] ?? "0")]
+    }
+    const [beforeX, beforeY] = parseTranslate(meteorBefore)
+    const [afterX, afterY] = parseTranslate(meteorAfter)
+    assert.equal(afterX > beforeX, true)
+    assert.equal(afterY < beforeY, true)
+
     await page.emulateMedia({ reducedMotion: "reduce" })
+    await page.waitForFunction(() => document.querySelectorAll(".hp-meteor").length === 0)
     const reduced = await slides.first().evaluate((slide) => ({
       earthAnimation: getComputedStyle(slide, "::before").animationName,
-      meteorAnimation: getComputedStyle(slide, "::after").animationName,
-      meteorOpacity: getComputedStyle(slide, "::after").opacity,
+      stageAnimation: getComputedStyle(document.querySelector<HTMLElement>(".deck")!, "::before").animationName,
+      meteorCount: slide.querySelectorAll(".hp-meteor").length,
+      starAnimations: Array.from(slide.querySelectorAll<HTMLElement>(".hp-star")).map((star) => getComputedStyle(star).animationName),
     }))
-    assert.deepEqual(reduced, { earthAnimation: "none", meteorAnimation: "none", meteorOpacity: "0.62" })
+    assert.equal(reduced.earthAnimation, "none")
+    assert.equal(reduced.stageAnimation, "none")
+    assert.equal(reduced.meteorCount, 0)
+    assert.equal(reduced.starAnimations.length, 15)
+    assert.equal(reduced.starAnimations.every((animation) => animation === "none"), true)
   })
+
+  await withRenderedPage(build.htmlPath, 1, async (page) => {
+    const first = page.locator(".slide").first()
+    assert.equal(await page.evaluate(() => document.documentElement.dataset.hpMotionSeed), undefined)
+    assert.equal(await page.locator(".hp-meteor").count(), 0)
+    assert.equal(await first.evaluate((slide) => getComputedStyle(slide, "::before").animationName), "none")
+    assert.equal(await first.locator(".hp-star").evaluateAll((stars) => stars.every((star) => getComputedStyle(star).animationName === "none")), true)
+  }, { mode: "render" })
 })
 
 test("CLI 原子导出写完成标记，失败不产生最终目录", async () => {
