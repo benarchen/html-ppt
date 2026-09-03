@@ -1,7 +1,7 @@
 ---
 id: "goal-005"
 name: "跨平台命令与最小 CI"
-status: "active"
+status: "blocked"
 created: "2026-09-03"
 target: "v0.5.0"
 depends_on: "goal-004"
@@ -194,6 +194,7 @@ source: "v0.4.0-post-release-project-health-review"
 - 视觉回归未更新基线；未执行 GitHub Release、npm publish、部署、合并或标签操作。
 - 从提交 `90b2414` 创建隔离副本并执行离线 `npm ci --ignore-scripts`，安装 111 个包、审计 0 漏洞；类型检查、三主题契约和 34 项非浏览器测试通过，干净副本因没有网络测试开关与私有输入而按设计跳过 2 项。
 - 施工分支已推送，Ubuntu／Windows 真实 CI 已通过；用户最终验收仍待完成。
+- 工程完成后连续三轮唯一剩余门禁均为用户明确验收，期间没有新的工程动作可推进；按状态规则将 Goal 更新为 `blocked`。恢复条件为用户回复「接受」或提供修改意见。
 
 ## 7．完成定义与验收标准
 
