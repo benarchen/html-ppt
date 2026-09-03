@@ -179,7 +179,8 @@ source: "v0.4.0-post-release-project-health-review"
 - 开发候选版本已统一更新为 `0.5.0`，`package.json`、锁文件和运行时版本入口保持一致。
 - 最终本地门禁已重跑：类型检查、三主题契约、20 项浏览器回归和 4 组视觉回归全部通过；34 项非浏览器测试为 33 通过、1 项按设计跳过。
 - 视觉回归未更新基线；未执行 GitHub Release、npm publish、部署、合并或标签操作。
-- 隔离安装、施工分支推送、Ubuntu／Windows 真实 CI 和用户最终验收仍待完成。
+- 从提交 `90b2414` 创建隔离副本并执行离线 `npm ci --ignore-scripts`，安装 111 个包、审计 0 漏洞；类型检查、三主题契约和 34 项非浏览器测试通过，干净副本因没有网络测试开关与私有输入而按设计跳过 2 项。
+- 施工分支推送、Ubuntu／Windows 真实 CI 和用户最终验收仍待完成。
 
 ## 7．完成定义与验收标准
 
@@ -188,7 +189,7 @@ source: "v0.4.0-post-release-project-health-review"
 - [ ] README 声明的每个支持平台都有实际验证证据。
 - [x] npm scripts 不依赖只在 POSIX shell 生效的内联环境变量赋值。
 - [ ] 安装、类型检查、非浏览器测试、主题检查和公开示例构建在支持平台可执行。
-- [ ] 空格路径、中文路径和 Windows 路径分隔符具有回归覆盖。
+- [x] 空格路径、中文路径和 Windows 路径分隔符具有回归覆盖。
 
 ### 7.2 CI
 
@@ -211,7 +212,7 @@ source: "v0.4.0-post-release-project-health-review"
 - [ ] Goal 005 施工记录和交付报告完整。
 - [ ] README、CLI、测试说明和 Roadmap 与实际平台支持一致。
 - [ ] 用户明确接受最终结果。
-- [ ] GitHub Release、npm publish、部署、许可证和可编辑 PPTX 仍明确排除。
+- [x] GitHub Release、npm publish、部署、许可证和可编辑 PPTX 仍明确排除。
 
 ## 8．自测清单
 
