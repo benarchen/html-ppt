@@ -66,6 +66,8 @@ GitHub 官方说明推荐使用 `setup-node` 配置 Node.js，支持通过 `perm
 
 Windows CI 验证路径分隔符和 Node.js 子进程行为；空格和中文路径由跨平台集成测试覆盖。视觉截图不在 Windows 比较，避免系统字体和渲染差异产生伪回归。
 
+首轮远端 CI `33779200028` 中，Ubuntu 核心 job 全部通过；Windows job 在非浏览器测试发现 CLI 入口的手工 `file://` URL 比较不兼容 Windows 路径，并发现参考 SVG 因 checkout 换行转换导致字节哈希变化。候选修复改用 `pathToFileURL()` 判断 CLI 主模块，并用 `.gitattributes` 保持主题参考证据的仓库字节；修复结果以后一轮 CI 为准。
+
 ## 6．本地候选验证
 
 施工前基线：类型检查通过；32 项非浏览器测试为 31 通过、1 项按设计跳过；三主题契约、18 项浏览器回归和 4 组视觉回归全部通过。

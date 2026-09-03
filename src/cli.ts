@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 import { rename, stat, writeFile } from "node:fs/promises"
 import path from "node:path"
+import { pathToFileURL } from "node:url"
 import { checkThemeSpecimens, compileDeck, recordBrowserMetadata, writeBuild } from "./build.js"
 import { HtmlPptError, formatError } from "./errors.js"
 import { exportContactSheet, exportPdf, exportPng, exportThemeReview } from "./exporter.js"
@@ -234,6 +235,6 @@ async function assertTargetMissing(target: string): Promise<void> {
   }
 }
 
-if (import.meta.url === `file://${process.argv[1]}`) {
+if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
   process.exitCode = await main()
 }

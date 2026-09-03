@@ -142,6 +142,12 @@ source: "v0.4.0-post-release-project-health-review"
 - workflow 权限为 `contents: read`，checkout 禁止持久化凭据，不使用 Secrets，不写回、不发布、不部署；并发策略会取消同一分支的过期运行。
 - `actions/checkout@6.0.2` 与 `actions/setup-node@7.0.0` 按 GitHub 安全建议固定到官方 tag 对应的完整提交 SHA。
 
+首轮远端验证记录（GitHub Actions `33779200028`）：
+
+- Ubuntu／Node.js 24 核心 job 全部通过。
+- Windows／Node.js 24 完成安装与类型检查后，在非浏览器测试暴露 3 个跨平台缺陷：CLI 主模块判断使用了手工拼接的 `file://` URL，Windows 路径无法匹配；由此导致 CLI 退出码与中文路径构建失败；参考 SVG 在 checkout 时发生换行转换，字节哈希不一致。
+- CLI 主模块判断改为标准库 `pathToFileURL()`；主题参考证据通过 `.gitattributes` 保持仓库字节不被换行转换。修复后的远端结果待下一轮 CI 验证。
+
 ### G3：增加 Windows 验证
 
 1. 在 Windows runner 执行依赖安装和核心门禁。
