@@ -5,7 +5,7 @@ description: "Markdown 驱动、HTML 优先的演示文稿生成项目协作规�
 
 # 项目目标
 
-本项目用于将 Markdown 内容转换为多风格演示文稿。HTML 是唯一视觉真相源，PDF、PNG 及未来可能支持的 PPTX 均为派生输出。
+本项目用于将 Markdown 内容转换为多风格演示文稿。HTML 是唯一视觉真相源，PDF、PNG 和高保真图片型 PPTX 均为派生输出。
 
 # 核心约束
 
@@ -24,6 +24,8 @@ description: "Markdown 驱动、HTML 优先的演示文稿生成项目协作规�
 - `themes/`：主题包及主题验收样张。
 - `examples/`：可运行的示例文稿。
 - `tests/`：单元测试、契约测试和视觉回归测试。
+- `scripts/`：不依赖 shell 方言的跨平台项目命令入口。
+- `.github/workflows/`：经授权维护的最小持续集成配置，不得包含发布或部署步骤。
 - `output/`：本地生成产物，禁止纳入版本管理或作为源文件修改。
 
 # 文档维护
@@ -57,7 +59,7 @@ npm run test:visual:update
 # 构建规则
 
 - 所有输出写入新的 `output/` 子目录，禁止覆盖已有目录。
-- PDF 和 PNG 导出前必须通过 Preflight。
+- PDF、PNG 和图片型 PPTX 导出前必须通过 Preflight。
 - `ERROR` 必须返回非零退出码；严格模式会把 `WARN` 升级为错误。
 - 主题必须通过 `npm run check:themes` 并覆盖全部 12 种标准布局。
-- 发布、部署、推送和可编辑 PPTX 不属于 v0.1 默认工作流。
+- 图片型 PPTX 已进入 `v0.4.0` 默认完整导出工作流；最小 CI 在 Goal 005 中实施，可编辑 PPTX、GitHub Release、npm publish 和部署仍属于独立后续工作。

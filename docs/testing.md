@@ -90,6 +90,15 @@ npm run test:visual
 
 随后使用目标主题执行严格 `check` 和 `export --format all`，并用 `base-light` 对同一真实内容复核，核对 `report.json`、PDF、PNG、PPTX、contact sheet 和主题审核页。
 
+## 持续集成分层
+
+- GitHub Actions 在 `push`、面向 `main` 的 Pull Request 和手工触发时运行。
+- 核心矩阵为 Ubuntu 与 Windows、Node.js 24 LTS，执行干净安装、类型检查、非浏览器测试和三主题契约。
+- 核心测试已经包含图片型 PPTX 的 OOXML 结构、图片关系和失败边界回归。
+- workflow 只授予 `contents: read`，不使用 Secrets，不写回仓库，不发布或部署。
+- Chromium 和视觉回归继续在固定发布环境执行，避免跨平台字体与浏览器渲染差异制造不稳定基线。
+- PowerPoint 与 Keynote 继续属于发布前人工实机验收，不属于 CI 覆盖范围。
+
 PPTX 验收分为三层：
 
 1. 用 JSZip 解包 OOXML，检查 `presentation.xml`、slide、relationship 与 media 部件。
@@ -102,7 +111,7 @@ PPTX 验收分为三层：
 
 ## 失败排查
 
-- `BROWSER_START`：检查 Chromium 是否通过 `PLAYWRIGHT_BROWSERS_PATH=0 npx playwright install chromium` 安装；受限环境需允许浏览器进程。
+- `BROWSER_START`：检查 Chromium 是否通过 `npm run browser:install` 安装；受限环境需允许浏览器进程。
 - `INPUT_*`：检查 Markdown 大小、元数据、路径和安全语法。
 - `THEME_*`：执行 `npm run check:themes`，检查 Manifest、token、布局或远程资源。
 - `PREFLIGHT_FAILED`：打开 `report.json`，按 slide id、规则 id 和源行修复，禁止隐藏或裁切内容。

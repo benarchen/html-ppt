@@ -7,6 +7,7 @@
 - 输出目录必须位于项目工作区内且不能预先存在。
 - 主题名称只能包含小写字母、数字和连字符。
 - 浏览器命令需要项目内 Chromium。
+- 首次使用浏览器命令前执行 `npm run browser:install`；该入口在 macOS、Linux 和 Windows 使用同一命令。
 - `build`、`preview`、`export` 和 `check` 支持 `--log-level quiet|normal|verbose`，默认 `normal`。
 
 ## `build`
@@ -30,7 +31,7 @@ npm run html-ppt -- preview <deck.md> [--theme <name>] [--port <number>] \
 ## `export`
 
 ```bash
-PLAYWRIGHT_BROWSERS_PATH=0 npm run html-ppt -- export <deck.md> \
+npm run html-ppt -- export <deck.md> \
   [--theme <name>] [--format pdf|png|pptx-flat|all] [--output <dir>] \
   [--log-level quiet|normal|verbose]
 ```
@@ -44,7 +45,7 @@ PPTX 固定为 16∶9，每页只有一张由最终 HTML 导出的 `2560 × 1440
 ## `check`
 
 ```bash
-PLAYWRIGHT_BROWSERS_PATH=0 npm run html-ppt -- check <deck.md> \
+npm run html-ppt -- check <deck.md> \
   [--theme <name>] [--strict] [--output <dir>] \
   [--log-level quiet|normal|verbose]
 ```

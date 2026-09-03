@@ -4,7 +4,7 @@
 
 公开仓库：https://github.com/benarchen/html-ppt
 
-当前开发候选版本：`v0.4.0`；最近公开基线版本：`v0.3.0`。
+当前稳定版本及最新公开标签：`v0.4.0`；Goal 005 的开发候选版本：`v0.5.0`。
 
 ## 当前能力
 
@@ -29,11 +29,13 @@
 
 ```bash
 npm install
-PLAYWRIGHT_BROWSERS_PATH=0 npx playwright install chromium
+npm run browser:install
 npm run build
 ```
 
 浏览器使用项目内安装路径，不需要全局安装 Chromium。
+
+安装和测试命令由 Node.js 脚本设置浏览器环境，在 macOS、Linux 和 Windows 使用相同的 npm script，不需要手工改写 `VAR=value command`。
 
 ## 快速开始
 
@@ -56,7 +58,7 @@ npm run html-ppt -- preview examples/specimen.md \
 导出 HTML、PDF、PNG、图片型 PPTX 和 contact sheet：
 
 ```bash
-PLAYWRIGHT_BROWSERS_PATH=0 npm run html-ppt -- export examples/specimen.md \
+npm run html-ppt -- export examples/specimen.md \
   --theme base-light \
   --format all \
   --output output/my-deck-export
@@ -65,7 +67,7 @@ PLAYWRIGHT_BROWSERS_PATH=0 npm run html-ppt -- export examples/specimen.md \
 严格检查：
 
 ```bash
-PLAYWRIGHT_BROWSERS_PATH=0 npm run html-ppt -- check examples/specimen.md \
+npm run html-ppt -- check examples/specimen.md \
   --theme base-light \
   --strict \
   --output output/my-deck-check
@@ -137,6 +139,8 @@ npm run test:visual
 
 `test:browser` 和 `test:visual` 会启动项目内 Chromium。在受限沙箱中运行时，需要允许本地浏览器进程和回环端口。
 
+GitHub Actions 在 Ubuntu 和 Windows 的 Node.js 24 LTS 环境执行 `typecheck`、非浏览器测试和三主题契约。Chromium、视觉回归及 PowerPoint／Keynote 实机检查继续作为发布前分层验证，不在最小 CI 中伪装成跨平台已覆盖。
+
 ## 当前限制
 
 - 当前只支持固定 16∶9 画布。
@@ -159,8 +163,10 @@ npm run test:visual
 - [Goal 002 交付报告](docs/delivery-goal-002.md)
 - [Goal 003 交付报告](docs/delivery-goal-003.md)
 - [Goal 004 交付报告](docs/delivery-goal-004.md)
+- [Goal 005 交付报告](docs/delivery-goal-005.md)
 - [施工 Goal](goals/001-v0.1-mvp.md)
 - [Goal 002 施工清单](goals/002-reference-theme-real-deck.md)
 - [Goal 003 施工清单](goals/003-presentation-player-and-cosmic-motion.md)
 - [Goal 004 施工清单](goals/004-pptx-flat-export.md)
+- [Goal 005 施工清单](goals/005-cross-platform-ci.md)
 - [项目路线图](ROADMAP.md)

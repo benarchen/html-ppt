@@ -1,6 +1,6 @@
 {
   "name": "html-ppt",
-  "version": "0.4.0",
+  "version": "0.5.0",
   "private": true,
   "type": "module",
   "description": "Markdown-driven, HTML-first presentation generator",
@@ -13,11 +13,12 @@
   },
   "scripts": {
     "build": "tsc -p tsconfig.json",
+    "browser:install": "node scripts/run-playwright.mjs install chromium",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "test": "npm run build && node --test build/tests/unit/*.test.js build/tests/integration/*.test.js",
-    "test:browser": "npm run build && PLAYWRIGHT_BROWSERS_PATH=0 HTML_PPT_NETWORK_TESTS=1 node --test build/tests/browser/*.test.js build/tests/integration/*.test.js",
-    "test:visual": "npm run build && PLAYWRIGHT_BROWSERS_PATH=0 playwright test",
-    "test:visual:update": "npm run build && PLAYWRIGHT_BROWSERS_PATH=0 playwright test --update-snapshots",
+    "test:browser": "npm run build && node scripts/run-browser-tests.mjs",
+    "test:visual": "npm run build && node scripts/run-playwright.mjs test",
+    "test:visual:update": "npm run build && node scripts/run-playwright.mjs test --update-snapshots",
     "html-ppt": "node build/src/cli.js",
     "deck:build": "npm run build --silent && node build/src/cli.js build",
     "deck:preview": "npm run build --silent && node build/src/cli.js preview",

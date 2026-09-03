@@ -94,31 +94,31 @@ test("运行时版本与 package.json 保持一致", async () => {
   assert.equal(HTML_PPT_VERSION, packageJson.version)
 })
 
-test("CLI 支持相对路径、空格路径和日志级别", async () => {
-  const project = await mkdtemp(path.join(os.tmpdir(), "html ppt cli project "))
+test("CLI 支持相对路径、空格／中文路径和日志级别", async () => {
+  const project = await mkdtemp(path.join(os.tmpdir(), "html ppt 中文 cli project "))
   await Promise.all([
     cp(path.join(root, "themes"), path.join(project, "themes"), { recursive: true }),
     cp(path.join(root, "examples"), path.join(project, "examples"), { recursive: true }),
   ])
-  const spacedInput = path.join(project, "examples", "deck with spaces.md")
+  const spacedInput = path.join(project, "examples", "deck 中文 with spaces.md")
   await cp(path.join(project, "examples", "specimen.md"), spacedInput)
   const cli = path.join(root, "build", "src", "cli.js")
-  const quiet = spawnSync(process.execPath, [cli, "build", "examples/deck with spaces.md", "--output", "output with spaces/deck build", "--log-level", "quiet"], {
+  const quiet = spawnSync(process.execPath, [cli, "build", "examples/deck 中文 with spaces.md", "--output", "输出 output with spaces/deck build", "--log-level", "quiet"], {
     cwd: project,
     encoding: "utf8",
   })
   assert.equal(quiet.status, 0, quiet.stderr)
   assert.equal(quiet.stdout, "")
-  await stat(path.join(project, "output with spaces", "deck build", "index.html"))
+  await stat(path.join(project, "输出 output with spaces", "deck build", "index.html"))
 
-  const verbose = spawnSync(process.execPath, [cli, "build", "examples/deck with spaces.md", "--output", "verbose-build", "--log-level", "verbose"], {
+  const verbose = spawnSync(process.execPath, [cli, "build", "examples/deck 中文 with spaces.md", "--output", "verbose-build", "--log-level", "verbose"], {
     cwd: project,
     encoding: "utf8",
   })
   assert.equal(verbose.status, 0, verbose.stderr)
   assert.match(verbose.stdout, /buildId=.*theme=base-light.*slides=12/)
 
-  const escaped = spawnSync(process.execPath, [cli, "build", "examples/deck with spaces.md", "--output", "../escaped"], { cwd: project, encoding: "utf8" })
+  const escaped = spawnSync(process.execPath, [cli, "build", "examples/deck 中文 with spaces.md", "--output", "../escaped"], { cwd: project, encoding: "utf8" })
   assert.equal(escaped.status, 1)
   assert.match(escaped.stderr, /OUTPUT_PATH/)
 })

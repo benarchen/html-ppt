@@ -1,1 +1,1 @@
-export const HTML_PPT_VERSION = "0.4.0"
+export const HTML_PPT_VERSION = "0.5.0"

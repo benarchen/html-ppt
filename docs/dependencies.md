@@ -53,3 +53,22 @@ Node.js 官方在 2026-08-30 将 v24 标记为 LTS、v26 标记为 Current。Pla
 图片型 PPTX 采用“JSZip＋项目内最小 OOXML 模板”路线：HTML 先由 Chromium 输出 `2560 × 1440` PNG，封装器只创建 presentation、master、blank layout、slide、relationship、theme 和 media 部件。页面布局仍完全来自 HTML，不在 PPTX 层建立第二套布局模型。
 
 PptxGenJS 4.0.1 的能力和 MIT 许可证本身满足候选要求，但其传递依赖在施工时不能通过项目安全门禁，因此未进入最终依赖树。JSZip 3.10.1 的 npm 版本发布较早，维护风险通过以下边界控制：固定版本、仅处理项目自产 PNG、生成结构由 OOXML 回归测试覆盖，并同时在 PowerPoint 与 Keynote 中实机打开验证。
+
+## CI Action 决策
+
+Goal 005 没有新增 npm 依赖。最小 CI 只使用 GitHub 官方 Action，并按 GitHub 安全建议固定到完整提交 SHA：
+
+| Action | 发布版本 | 固定提交 | 用途 |
+|---|---:|---|---|
+| `actions/checkout` | 6.0.2 | `de0fac2e4500dabe0009e67214ff5f5447ce83dd` | 以只读凭据检出仓库 |
+| `actions/setup-node` | 7.0.0 | `820762786026740c76f36085b0efc47a31fe5020` | 在 Ubuntu 与 Windows 配置 Node.js 24 和 npm 缓存 |
+
+workflow 顶层权限固定为 `contents: read`，checkout 禁用凭据持久化，不读取 Secrets，不写回仓库，不执行发布或部署。版本与提交在 2026-09-03 通过 GitHub 官方仓库 tag API 核对；后续升级必须重新核对官方 release 与完整 SHA。
+
+参考：
+
+- https://docs.github.com/en/actions/tutorials/build-and-test-code/nodejs
+- https://docs.github.com/en/actions/reference/security/secure-use
+- https://docs.github.com/en/actions/reference/workflows-and-actions/workflow-syntax
+- https://github.com/actions/checkout/releases/tag/v6.0.2
+- https://github.com/actions/setup-node/releases/tag/v7.0.0

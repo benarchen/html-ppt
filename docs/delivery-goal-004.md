@@ -2,7 +2,7 @@
 
 ## 1．交付结论
 
-Goal 004 已完成代码、自动化和候选产物施工，当前开发候选版本为 `0.4.0`。同一份 Markdown 现在可以沿既有 HTML 主链路生成 HTML、PDF、PNG 和图片型 PPTX：
+Goal 004 已完成代码、自动化、候选产物、用户验收和远端发布，`v0.4.0` 是当前稳定版本及最新公开标签。同一份 Markdown 现在可以沿既有 HTML 主链路生成 HTML、PDF、PNG 和图片型 PPTX：
 
 ```text
 Markdown
@@ -23,7 +23,7 @@ HTML 仍是唯一视觉真相源。PPTX 每页只有一个满版 PNG 对象，�
 - `src/version.ts` 是运行时统一版本入口。
 - CLI 帮助、build id、`build.json.engineVersion` 和 PPTX `AppVersion` 均使用同一版本常量。
 - 自动化测试比较运行时版本与 `package.json.version`；不一致时测试失败。
-- 当前 `package.json`、锁文件和运行时元数据统一为 `0.4.0`。
+- Goal 004 发布时的 `package.json`、锁文件和运行时元数据统一为 `0.4.0`。
 - Deck IR、Markdown 和 Theme Spec 的 schema 版本没有改变。
 
 ## 3．依赖决策
