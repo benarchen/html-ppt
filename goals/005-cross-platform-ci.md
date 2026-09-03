@@ -135,7 +135,7 @@ source: "v0.4.0-post-release-project-health-review"
 
 验证：故意制造类型、测试或主题契约错误时，对应 job 返回失败；恢复后通过。
 
-实施记录（2026-09-03，远端结果待补）：
+实施记录（2026-09-03）：
 
 - 已创建 `.github/workflows/ci.yml`，触发范围为 `main`、`goal-*` 分支、面向 `main` 的 Pull Request 和手工触发。
 - 核心矩阵冻结为 Ubuntu／Windows 与 Node.js 24 LTS，依次执行 `npm ci --ignore-scripts`、类型检查、非浏览器测试和三主题契约。
@@ -146,7 +146,8 @@ source: "v0.4.0-post-release-project-health-review"
 
 - Ubuntu／Node.js 24 核心 job 全部通过。
 - Windows／Node.js 24 完成安装与类型检查后，在非浏览器测试暴露 3 个跨平台缺陷：CLI 主模块判断使用了手工拼接的 `file://` URL，Windows 路径无法匹配；由此导致 CLI 退出码与中文路径构建失败；参考 SVG 在 checkout 时发生换行转换，字节哈希不一致。
-- CLI 主模块判断改为标准库 `pathToFileURL()`；主题参考证据通过 `.gitattributes` 保持仓库字节不被换行转换。修复后的远端结果待下一轮 CI 验证。
+- CLI 主模块判断改为标准库 `pathToFileURL()`；主题参考证据通过 `.gitattributes` 保持仓库字节不被换行转换。
+- 第二轮远端 CI `33779665251` 全部通过：Ubuntu／Node.js 24 用时 17 秒，Windows／Node.js 24 用时 46 秒；两个 job 的安装、类型检查、34 项非浏览器测试和三主题契约均成功。
 
 ### G3：增加 Windows 验证
 
@@ -155,6 +156,12 @@ source: "v0.4.0-post-release-project-health-review"
 3. 验证不依赖 Bash、zsh 或 POSIX 环境变量赋值。
 
 验证：Windows 核心 job 稳定通过，失败日志不暴露绝对私有路径或凭据。
+
+实施记录（2026-09-03）：
+
+- Windows Server 2025 hosted runner 使用 Node.js `24.19.0` 完成干净安装、类型检查、非浏览器测试和三主题契约。
+- CLI 退出码、空格／中文路径、路径边界、图片型 PPTX OOXML 和主题参考证据哈希均通过真实 Windows 验证。
+- GitHub Actions 运行 `33779665251` 没有使用项目 Secrets，日志只包含 hosted runner 的临时工作路径。
 
 ### G4：浏览器与视觉回归分层
 
@@ -186,22 +193,22 @@ source: "v0.4.0-post-release-project-health-review"
 - 最终本地门禁已重跑：类型检查、三主题契约、20 项浏览器回归和 4 组视觉回归全部通过；34 项非浏览器测试为 33 通过、1 项按设计跳过。
 - 视觉回归未更新基线；未执行 GitHub Release、npm publish、部署、合并或标签操作。
 - 从提交 `90b2414` 创建隔离副本并执行离线 `npm ci --ignore-scripts`，安装 111 个包、审计 0 漏洞；类型检查、三主题契约和 34 项非浏览器测试通过，干净副本因没有网络测试开关与私有输入而按设计跳过 2 项。
-- 施工分支推送、Ubuntu／Windows 真实 CI 和用户最终验收仍待完成。
+- 施工分支已推送，Ubuntu／Windows 真实 CI 已通过；用户最终验收仍待完成。
 
 ## 7．完成定义与验收标准
 
 ### 7.1 跨平台
 
-- [ ] README 声明的每个支持平台都有实际验证证据。
+- [x] README 声明的每个支持平台都有实际验证证据。
 - [x] npm scripts 不依赖只在 POSIX shell 生效的内联环境变量赋值。
-- [ ] 安装、类型检查、非浏览器测试、主题检查和公开示例构建在支持平台可执行。
+- [x] 安装、类型检查、非浏览器测试、主题检查和公开示例构建在支持平台可执行。
 - [x] 空格路径、中文路径和 Windows 路径分隔符具有回归覆盖。
 
 ### 7.2 CI
 
-- [ ] Pull Request 和 `main` 提交能够触发核心 CI。
-- [ ] CI 至少覆盖 Node.js 24 LTS、类型检查、非浏览器测试和主题契约。
-- [ ] 图片型 PPTX OOXML 测试进入核心 CI。
+- [x] Pull Request 和 `main` 提交能够触发核心 CI。
+- [x] CI 至少覆盖 Node.js 24 LTS、类型检查、非浏览器测试和主题契约。
+- [x] 图片型 PPTX OOXML 测试进入核心 CI。
 - [x] CI 使用最小权限，不包含发布、写回或生产凭据。
 - [x] 视觉基线只能人工显式更新。
 - [x] PowerPoint／Keynote 继续标记为人工验收，不声称已被 CI 覆盖。
@@ -215,8 +222,8 @@ source: "v0.4.0-post-release-project-health-review"
 
 ### 7.4 文档与收尾
 
-- [ ] Goal 005 施工记录和交付报告完整。
-- [ ] README、CLI、测试说明和 Roadmap 与实际平台支持一致。
+- [x] Goal 005 施工记录和交付报告完整。
+- [x] README、CLI、测试说明和 Roadmap 与实际平台支持一致。
 - [ ] 用户明确接受最终结果。
 - [x] GitHub Release、npm publish、部署、许可证和可编辑 PPTX 仍明确排除。
 

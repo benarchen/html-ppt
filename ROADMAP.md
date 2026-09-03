@@ -2,7 +2,7 @@
 
 ## 当前阶段
 
-`v0.4.0` 是当前稳定版本及最新公开标签。Goal 004 图片型 PPTX 导出已完成并发布。Goal 005「跨平台命令与最小 CI」已经启动，当前在 `goal-005-cross-platform-ci` 分支施工；范围为跨平台命令、Windows 核心验证和最小 CI。公开分发和有限可编辑 PPTX 继续延后。
+`v0.4.0` 是当前稳定版本及最新公开标签。Goal 004 图片型 PPTX 导出已完成并发布。Goal 005「跨平台命令与最小 CI」的范围内实现、Ubuntu／Windows CI、本地门禁和隔离安装均已完成，当前在 `goal-005-cross-platform-ci` 分支等待用户验收。公开分发和有限可编辑 PPTX 继续延后。
 
 ## 已完成
 
@@ -54,11 +54,11 @@
 
 ## 进行中
 
-- Goal 005 当前为 `active`；本地跨平台入口、最小 CI、路径回归、文档候选、`0.5.0` 最终门禁和隔离安装已完成，正在推送施工分支以获取 Ubuntu／Windows 真实 CI 结果。
+- Goal 005 当前为 `active`；本地跨平台入口、最小 CI、路径回归、`0.5.0` 最终门禁、隔离安装和 Ubuntu／Windows 真实 CI 已完成，等待用户验收。
 
 ## 待办
 
-- 完成 Goal 005 的 Ubuntu／Windows 真实 CI 和用户验收。
+- 完成 Goal 005 的用户验收；验收后同步 Goal／Roadmap，再决定是否合并 `main` 并创建 `v0.5.0` 标签。
 - GitHub Release、npm publish、许可证切换和部署继续延后；如需实施，另立公开分发 Goal 并单独授权。
 - 有限可编辑 PPTX 继续延后；如需评估，另立 Renderer Goal。
 
@@ -72,6 +72,8 @@
 - `output/` 只保存本地产物，不作为源文件提交。
 
 ## 最近验证
+
+- 2026-09-03：Goal 005 第二轮远端 CI `33779665251` 全部通过。Ubuntu／Node.js 24 用时 17 秒，Windows Server 2025／Node.js 24.19.0 用时 46 秒；两个 job 的干净安装、类型检查、34 项非浏览器测试和三主题契约均成功。范围内工程工作完成，当前只等待用户验收。
 
 - 2026-09-03：Goal 005 首轮远端 CI `33779200028` 中，Ubuntu／Node.js 24 全部通过；Windows／Node.js 24 在非浏览器测试暴露 CLI 主模块 URL 判断与参考 SVG checkout 换行转换两个根因，表现为 3 项失败。CLI 改用 `pathToFileURL()`，主题参考证据增加不转换字节的 Git 属性，等待下一轮 CI 验证。
 

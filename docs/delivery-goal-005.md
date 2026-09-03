@@ -4,7 +4,7 @@
 
 Goal 005 已完成本地候选实现，开发候选版本为 `0.5.0`。浏览器安装、浏览器回归和视觉回归现在通过 Node.js 入口设置环境，不再要求用户使用 POSIX 的 `VAR=value command` 语法。
 
-最小 GitHub Actions CI 已配置 Ubuntu／Windows、Node.js 24 LTS 核心矩阵。本报告当前等待施工分支推送后的真实 CI 结果；在 Windows job、最终自测和用户验收完成前，Goal 保持 `active`。
+最小 GitHub Actions CI 已配置 Ubuntu／Windows、Node.js 24 LTS 核心矩阵，并已在施工分支完成真实验证。范围内实现、最终本地门禁和隔离安装均已完成；Goal 仅等待用户最终验收，因此保持 `active`。
 
 ## 2．跨平台命令设计
 
@@ -66,7 +66,16 @@ GitHub 官方说明推荐使用 `setup-node` 配置 Node.js，支持通过 `perm
 
 Windows CI 验证路径分隔符和 Node.js 子进程行为；空格和中文路径由跨平台集成测试覆盖。视觉截图不在 Windows 比较，避免系统字体和渲染差异产生伪回归。
 
-首轮远端 CI `33779200028` 中，Ubuntu 核心 job 全部通过；Windows job 在非浏览器测试发现 CLI 入口的手工 `file://` URL 比较不兼容 Windows 路径，并发现参考 SVG 因 checkout 换行转换导致字节哈希变化。候选修复改用 `pathToFileURL()` 判断 CLI 主模块，并用 `.gitattributes` 保持主题参考证据的仓库字节；修复结果以后一轮 CI 为准。
+首轮远端 CI `33779200028` 中，Ubuntu 核心 job 全部通过；Windows job 在非浏览器测试发现 CLI 入口的手工 `file://` URL 比较不兼容 Windows 路径，并发现参考 SVG 因 checkout 换行转换导致字节哈希变化。候选修复改用 `pathToFileURL()` 判断 CLI 主模块，并用 `.gitattributes` 保持主题参考证据的仓库字节。
+
+第二轮远端 CI `33779665251` 全部通过：
+
+| Job | Hosted 环境 | 结果 | 用时 |
+|---|---|---|---:|
+| Ubuntu core | `ubuntu-latest`／Node.js 24 | 安装、类型检查、34 项非浏览器测试、三主题契约通过 | 17 秒 |
+| Windows core | Windows Server 2025／Node.js 24.19.0 | 安装、类型检查、34 项非浏览器测试、三主题契约通过 | 46 秒 |
+
+运行证据：https://github.com/benarchen/html-ppt/actions/runs/33779665251
 
 ## 6．本地候选验证
 
@@ -90,9 +99,9 @@ Windows CI 验证路径分隔符和 Node.js 子进程行为；空格和中文路
 - Windows 浏览器导出、视觉截图和 PowerPoint 实机兼容不属于最小 CI 的承诺范围。
 - CI 不访问私有真实文稿，因此对应测试按设计跳过。
 - GitHub-hosted runner 的具体镜像内容由 GitHub 维护；项目只冻结 Node.js 主版本和 Action 完整 SHA。
-- 当前尚未完成 Windows 真实 job 和用户验收。
+- 当前尚未完成用户最终验收。
 - 当前尚未合并到 `main`，未创建 `v0.5.0` 标签，未执行 GitHub Release、npm publish 或部署。
 
 ## 8．验收状态
 
-Goal 005 当前为 `active`。施工分支 CI 全部通过、最终文档同步并获得用户明确接受后，才可以更新为 `complete` 并进入合并与标签流程。
+Goal 005 当前为 `active`。施工分支 CI 和最终文档已经完成；获得用户明确接受后，才可以更新为 `complete` 并进入合并与标签流程。
