@@ -2,7 +2,7 @@
 
 ## 当前阶段
 
-`v0.3.0` 已发布到公开 GitHub 仓库，本地 `main` 继续跟踪 `origin/main`。Goal 004 图片型 PPTX 导出已由用户验收并更新为 `complete`，开发候选版本为 `0.4.0`；JSZip 最小 OOXML 实现、CLI 四格式矩阵、三主题与真实 27 页候选、完整质量门禁和 PowerPoint／Keynote 实机验收均已通过。未执行 commit、tag、push、Release、npm publish 或部署。
+`v0.4.0` 已发布到公开 GitHub 仓库，本地 `main` 继续跟踪 `origin/main`。Goal 004 图片型 PPTX 导出已完成并发布；JSZip 最小 OOXML 实现、CLI 四格式矩阵、三主题与真实 27 页候选、完整质量门禁和 PowerPoint／Keynote 实机验收均已通过。未执行 GitHub Release、npm publish 或部署。
 
 ## 已完成
 
@@ -48,6 +48,7 @@
 - 完成 Goal 004：统一版本来源，实现 HTML → PNG → 图片型 PPTX 的最小 OOXML 导出、CLI 四格式矩阵、原子交付和结构／哈希回归。
 - 完成三主题 specimen 与真实 27 页文稿共 63 页候选验证，并通过 PowerPoint／Keynote 实机兼容性验收。
 - 用户于 2026-09-03 明确接受本次施工结果，Goal 004 完成定义全部满足，状态更新为 `complete`。
+- 创建实现提交 `005473c` 和注解标签 `v0.4.0`，并通过 SSH 将 `main` 与标签推送到公开仓库。
 
 ## 进行中
 
@@ -64,6 +65,8 @@
 - 当前无工程阻塞。
 
 ## 最近验证
+
+- 2026-09-03：`v0.4.0` 发布门禁通过：类型检查、32 项非浏览器测试、三主题契约、18 项 Chromium 回归和 4 组视觉回归全部通过；非浏览器套件为 31 通过、1 项按设计跳过。创建实现提交 `005473c`（`feat: 完成 Goal 004 图片型 PPTX 导出与验收`）和注解标签 `v0.4.0`，通过 SSH 将 `main` 与标签推送到 `origin`。GitHub Release、npm publish、生产部署和 `release` 分支均未操作。
 
 - 2026-09-03：用户明确回复“接受本次施工成功”；Goal 004 最终真实文稿 PPTX 与施工结果验收通过，Goal 状态由 `blocked` 更新为 `complete`。CI 与公开分发决策保持不变，未执行 commit、tag、push、Release、npm publish 或部署。
 

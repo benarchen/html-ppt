@@ -16,7 +16,7 @@ Markdown
 
 HTML 仍是唯一视觉真相源。PPTX 每页只有一个满版 PNG 对象，不在 OOXML 层重新排版；视觉与 HTML 派生 PNG 一致，但页面内文字、图表、表格和形状不可编辑。
 
-代码与候选产物已通过 Microsoft PowerPoint 和 Apple Keynote 实机验证。用户于 2026-09-03 明确接受本次施工结果，Goal 004 已更新为 `complete`；未执行 commit、tag、push、GitHub Release、npm publish 或部署。
+代码与候选产物已通过 Microsoft PowerPoint 和 Apple Keynote 实机验证。用户于 2026-09-03 明确接受本次施工结果，Goal 004 已更新为 `complete`。实现提交 `005473c` 和注解标签 `v0.4.0` 已通过 SSH 推送到公开 GitHub 仓库；未执行 GitHub Release、npm publish 或部署。
 
 ## 2．版本漂移修复
 
@@ -131,8 +131,8 @@ PowerPoint 首个候选曾出现修复提示。根因是 slide master 中的 lay
 
 - CI：本 Goal 不修改 CI／CD。建议在用户接受 `0.4.0` 后另立工程化 Goal，把无需 GUI 的类型检查、非浏览器测试、主题契约和 OOXML 测试加入 CI；浏览器与双软件实机验收仍分层处理。
 - 公开分发：当前继续维持“源码公开、个人工具、`private: true`、`UNLICENSED`”状态。若要 npm 分发或 GitHub Release，必须另立 Goal 补齐项目许可证、CHANGELOG、发布包边界和跨平台验证。
-- 本次未修改 CI 配置，未执行 GitHub Release、npm publish 或部署。commit、tag 和 push 也尚未执行，需用户单独授权。
+- 本次未修改 CI 配置，未执行 GitHub Release、npm publish 或部署。用户授权后，已创建实现提交 `005473c` 和注解标签 `v0.4.0`，并通过 SSH 推送 `main` 与标签。
 
 ## 11．验收状态
 
-实现、自动化、候选产物和 PowerPoint／Keynote 兼容性验收已经完成。用户于 2026-09-03 明确回复“接受本次施工成功”，Goal 004 状态已更新为 `complete`。提交、标签与远端同步仍属于独立操作，尚未执行。
+实现、自动化、候选产物和 PowerPoint／Keynote 兼容性验收已经完成。用户于 2026-09-03 明确回复“接受本次施工成功”，Goal 004 状态已更新为 `complete`。实现提交 `005473c`、注解标签 `v0.4.0`、`main` 与标签均已同步到远端。
