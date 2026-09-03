@@ -120,8 +120,8 @@ source: "v0.4.0-post-release-project-health-review"
 实施记录（2026-09-03）：
 
 - 新增 `scripts/run-playwright.mjs`，通过 Node.js 设置项目内浏览器路径并直接调用 Playwright CLI。
-- 新增 `scripts/run-browser-tests.mjs`，使用 `node:fs/promises` 的 `glob()` 展开测试文件，通过 `spawnSync()` 显式传递环境，不调用 shell。
-- `browser:install`、`test:browser`、`test:visual` 和 `test:visual:update` 不再包含 POSIX 内联环境变量赋值。
+- 新增 `scripts/run-node-tests.mjs` 和 `scripts/run-browser-tests.mjs`，使用 `node:fs/promises` 的 `glob()` 展开测试文件；核心与浏览器测试都不依赖 shell 展开通配符，浏览器入口通过 `spawnSync()` 显式传递环境。
+- `test`、`browser:install`、`test:browser`、`test:visual` 和 `test:visual:update` 不再包含 POSIX 内联环境变量赋值或测试文件通配符展开依赖。
 - README 与 CLI／测试文档统一使用跨平台 npm scripts；路径回归扩展为空格和中文目录。
 - 未引入 `cross-env` 或其他新 npm 依赖。
 

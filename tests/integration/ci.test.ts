@@ -6,12 +6,13 @@ import { parse } from "yaml"
 
 const root = process.cwd()
 
-test("浏览器相关 npm scripts 不依赖 POSIX 内联环境变量", async () => {
+test("测试相关 npm scripts 不依赖 shell 方言", async () => {
   const packageJson = JSON.parse(await readFile(path.join(root, "package.json"), "utf8")) as { scripts: Record<string, string> }
-  for (const name of ["browser:install", "test:browser", "test:visual", "test:visual:update"]) {
+  for (const name of ["test", "browser:install", "test:browser", "test:visual", "test:visual:update"]) {
     const command = packageJson.scripts[name]
     assert.ok(command, `缺少 npm script：${name}`)
     assert.doesNotMatch(command, /(?:^|&&\s+)[A-Z][A-Z0-9_]*=/, `${name} 仍包含 POSIX 环境变量赋值`)
+    assert.doesNotMatch(command, /(?:^|\s)(?:build\/)?tests\/[^\s]*\*/, `${name} 仍依赖 shell 展开测试文件通配符`)
   }
 })
 

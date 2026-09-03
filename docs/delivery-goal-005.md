@@ -9,6 +9,7 @@ Goal 005 已完成本地候选实现，开发候选版本为 `0.5.0`。浏览器
 ## 2．跨平台命令设计
 
 - `scripts/run-playwright.mjs` 使用 `import.meta.resolve()` 定位项目内 Playwright CLI，并通过子进程环境设置 `PLAYWRIGHT_BROWSERS_PATH`。
+- `scripts/run-node-tests.mjs` 使用 Node.js `glob()` 生成核心测试文件列表，避免依赖 shell 展开测试路径。
 - `scripts/run-browser-tests.mjs` 使用 Node.js `glob()` 获取明确的测试文件列表，不依赖 Bash、zsh、cmd.exe 或 PowerShell 展开通配符。
 - `HTML_PPT_NETWORK_TESTS` 由 Node.js 包装入口传递，`npm run test:browser` 在各平台保持相同语义。
 - `npm run browser:install` 取代文档中的平台专用安装写法。

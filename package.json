@@ -15,7 +15,7 @@
     "build": "tsc -p tsconfig.json",
     "browser:install": "node scripts/run-playwright.mjs install chromium",
     "typecheck": "tsc -p tsconfig.json --noEmit",
-    "test": "npm run build && node --test build/tests/unit/*.test.js build/tests/integration/*.test.js",
+    "test": "npm run build && node scripts/run-node-tests.mjs",
     "test:browser": "npm run build && node scripts/run-browser-tests.mjs",
     "test:visual": "npm run build && node scripts/run-playwright.mjs test",
     "test:visual:update": "npm run build && node scripts/run-playwright.mjs test --update-snapshots",
