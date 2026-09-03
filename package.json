@@ -1,6 +1,6 @@
 {
   "name": "html-ppt",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "private": true,
   "type": "module",
   "description": "Markdown-driven, HTML-first presentation generator",
@@ -26,6 +26,7 @@
     "check:themes": "npm run build --silent && node build/src/cli.js check-themes"
   },
   "dependencies": {
+    "jszip": "3.10.1",
     "remark-directive": "4.0.0",
     "remark-frontmatter": "5.0.0",
     "remark-gfm": "4.0.1",

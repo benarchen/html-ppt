@@ -7,6 +7,7 @@ import test from "node:test"
 import { checkThemeSpecimens, compileDeck, writeBuild } from "../../src/build.js"
 import { HtmlPptError } from "../../src/errors.js"
 import { startPreview } from "../../src/preview.js"
+import { HTML_PPT_VERSION } from "../../src/version.js"
 
 const root = process.cwd()
 const input = path.join(root, "examples", "specimen.md")
@@ -38,9 +39,10 @@ test("构建产物完整且拒绝覆盖", async () => {
   const result = await writeBuild(compiled, output, temp)
   await Promise.all([result.htmlPath, result.irPath, result.plannedIrPath, result.metadataPath].map((file) => stat(file)))
   assert.equal(await readFile(input, "utf8"), compiled.source)
-  const metadata = JSON.parse(await readFile(result.metadataPath, "utf8")) as { slideCount: number; buildId: string }
+  const metadata = JSON.parse(await readFile(result.metadataPath, "utf8")) as { slideCount: number; buildId: string; engineVersion: string }
   assert.equal(metadata.slideCount, 12)
   assert.equal(metadata.buildId.length, 16)
+  assert.equal(metadata.engineVersion, HTML_PPT_VERSION)
   for (const file of [result.htmlPath, result.irPath, result.plannedIrPath, result.metadataPath]) {
     assert.doesNotMatch(await readFile(file, "utf8"), new RegExp(root.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")))
   }
@@ -70,7 +72,8 @@ test("CLI 使用稳定退出码", () => {
   const cli = path.join(root, "build", "src", "cli.js")
   const help = spawnSync(process.execPath, [cli, "--help"], { encoding: "utf8" })
   assert.equal(help.status, 0)
-  assert.match(help.stdout, /html-ppt v0\.1\.0/)
+  assert.equal(help.stdout.split("\n", 1)[0], `html-ppt v${HTML_PPT_VERSION}`)
+  assert.match(help.stdout, /--format pdf\|png\|pptx-flat\|all/)
   const invalid = spawnSync(process.execPath, [cli, "unknown"], { encoding: "utf8" })
   assert.equal(invalid.status, 2)
   assert.match(invalid.stderr, /CLI_COMMAND/)
@@ -78,12 +81,17 @@ test("CLI 使用稳定退出码", () => {
   for (const command of ["build", "preview", "export", "check", "inspect-ir", "check-themes"]) {
     const commandHelp = spawnSync(process.execPath, [cli, command, "--help"], { encoding: "utf8" })
     assert.equal(commandHelp.status, 0)
-    assert.match(commandHelp.stdout, /html-ppt v0\.1\.0/)
+    assert.equal(commandHelp.stdout.split("\n", 1)[0], `html-ppt v${HTML_PPT_VERSION}`)
   }
 
   const missingInput = spawnSync(process.execPath, [cli, "build"], { encoding: "utf8" })
   assert.equal(missingInput.status, 2)
   assert.match(missingInput.stderr, /CLI_INPUT/)
+})
+
+test("运行时版本与 package.json 保持一致", async () => {
+  const packageJson = JSON.parse(await readFile(path.join(root, "package.json"), "utf8")) as { version: string }
+  assert.equal(HTML_PPT_VERSION, packageJson.version)
 })
 
 test("CLI 支持相对路径、空格路径和日志级别", async () => {

@@ -31,13 +31,15 @@ npm run html-ppt -- preview <deck.md> [--theme <name>] [--port <number>] \
 
 ```bash
 PLAYWRIGHT_BROWSERS_PATH=0 npm run html-ppt -- export <deck.md> \
-  [--theme <name>] [--format pdf|png|all] [--output <dir>] \
+  [--theme <name>] [--format pdf|png|pptx-flat|all] [--output <dir>] \
   [--log-level quiet|normal|verbose]
 ```
 
-先构建并执行 Preflight，再导出 PDF 或 PNG。`all` 同时生成两种格式；PNG 导出还会生成 `contact-sheet.html`。主题包含 `style-spec.json` 时，还会生成集中展示参考图、Style Spec、Manifest、token 和全部页面的 `theme-review.html`。
+先构建并执行 Preflight，再按格式导出派生产物。`pdf` 只生成 PDF；`png` 生成逐页 PNG 和 `contact-sheet.html`；`pptx-flat` 在保留同一组 PNG 的同时将其逐页封装为不可编辑的 `deck.pptx`；`all` 同时生成 PDF、PNG 和 PPTX。未提供 `--format` 时等价于 `all`。主题包含 `style-spec.json` 时，还会生成集中展示参考图、Style Spec、Manifest、token 和全部页面的 `theme-review.html`。
 
-导出过程使用 `<output>.partial-<pid>-<timestamp>` 工作目录。工具会核对 HTML、PDF、PNG 页数和 PNG 尺寸；只有 Preflight 与全部导出步骤成功后，工作目录才会写入 `delivery.json` 并原子重命名为目标目录。失败时不会出现目标目录，残留的 `.partial-*` 目录也不具备完成标记，不能当作交付物。
+PPTX 固定为 16∶9，每页只有一张由最终 HTML 导出的 `2560 × 1440` PNG。它不会重新排版，也不保留 HTML 动画和交互；`delivery.json` 会记录 `pptxMode: "flat"` 与 `pptxEditable: false`。
+
+导出过程使用 `<output>.partial-<pid>-<timestamp>` 工作目录。工具会核对 HTML、PDF、PNG 与 PPTX 页数，并校验 PNG 尺寸；只有 Preflight 与全部导出步骤成功后，工作目录才会写入 `delivery.json` 并原子重命名为目标目录。失败时不会出现目标目录，残留的 `.partial-*` 目录也不具备完成标记，不能当作交付物。
 
 ## `check`
 

@@ -5,6 +5,7 @@ import os from "node:os"
 import path from "node:path"
 import test from "node:test"
 import { getDocument } from "pdfjs-dist/legacy/build/pdf.mjs"
+import JSZip from "jszip"
 import { compileDeck, writeBuild } from "../../src/build.js"
 import { withRenderedPage } from "../../src/browser.js"
 import { exportContactSheet, exportPdf, exportPng, exportThemeReview } from "../../src/exporter.js"
@@ -371,14 +372,52 @@ test("CLI 原子导出写完成标记，失败不产生最终目录", async () =
   })
   assert.equal(success.status, 0, success.stderr)
   assert.equal(success.stdout, "")
-  const delivery = JSON.parse(await readFile(path.join(project, "release", "delivery.json"), "utf8")) as { status: string; files: string[] }
+  const delivery = JSON.parse(await readFile(path.join(project, "release", "delivery.json"), "utf8")) as {
+    status: string
+    files: string[]
+    artifacts: { pptxPages: number; pptxMode: string; pptxEditable: boolean; pptxSize: string; pptxImageSize: string }
+  }
   const metadata = JSON.parse(await readFile(path.join(project, "release", "build.json"), "utf8")) as { runtime: { chromium: string } }
   const report = JSON.parse(await readFile(path.join(project, "release", "report.json"), "utf8")) as { runtime: { browserVersion: string } }
   assert.equal(delivery.status, "complete")
   assert.equal(delivery.files.includes("deck.pdf"), true)
+  assert.equal(delivery.files.includes("deck.pptx"), true)
   assert.equal(delivery.files.includes("theme-review.html"), true)
+  assert.deepEqual(delivery.artifacts, {
+    htmlPages: 12,
+    pdfPages: 12,
+    pngPages: 12,
+    pngSize: "2560x1440",
+    pptxPages: 12,
+    pptxMode: "flat",
+    pptxEditable: false,
+    pptxSize: "13.333333x7.5in",
+    pptxImageSize: "2560x1440",
+  })
+  const pptx = await JSZip.loadAsync(await readFile(path.join(project, "release", "deck.pptx")))
+  assert.equal(Object.keys(pptx.files).filter((file) => /^ppt\/slides\/slide\d+\.xml$/.test(file)).length, 12)
+  assert.equal(Object.keys(pptx.files).filter((file) => /^ppt\/media\/image\d+\.png$/.test(file)).length, 12)
   assert.equal(metadata.runtime.chromium, report.runtime.browserVersion)
   assert.notEqual(metadata.runtime.chromium, "not-run")
+
+  const formatCases = [
+    { format: "pdf", output: "pdf-only", present: ["deck.pdf"], absent: ["slides", "deck.pptx"] },
+    { format: "png", output: "png-only", present: ["slides", "contact-sheet.html"], absent: ["deck.pdf", "deck.pptx"] },
+    { format: "pptx-flat", output: "pptx-only", present: ["slides", "contact-sheet.html", "deck.pptx"], absent: ["deck.pdf"] },
+  ] as const
+  for (const formatCase of formatCases) {
+    const result = spawnSync(process.execPath, [cli, "export", "examples/specimen.md", "--theme", "base-light", "--format", formatCase.format, "--output", formatCase.output, "--log-level", "quiet"], {
+      cwd: project,
+      env,
+      encoding: "utf8",
+      timeout: 60_000,
+    })
+    assert.equal(result.status, 0, result.stderr)
+    for (const file of formatCase.present) await stat(path.join(project, formatCase.output, file))
+    for (const file of formatCase.absent) {
+      await assert.rejects(() => stat(path.join(project, formatCase.output, file)), (error) => (error as NodeJS.ErrnoException).code === "ENOENT")
+    }
+  }
 
   const failed = spawnSync(process.execPath, [cli, "export", "examples/specimen.md", "--theme", "base-light", "--format", "pdf", "--output", "failed", "--log-level", "quiet"], {
     cwd: project,

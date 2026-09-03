@@ -4,7 +4,7 @@
 
 公开仓库：https://github.com/benarchen/html-ppt
 
-当前公开基线版本：`v0.3.0`。
+当前开发候选版本：`v0.4.0`；最近公开基线版本：`v0.3.0`。
 
 ## 当前能力
 
@@ -15,7 +15,7 @@
 - 生成可离线打开的静态 HTML。
 - 默认 HTML 以逐页演示模式打开，支持键盘、滚轮／触控板和 URL hash 深链接。
 - 提供本地预览与源文件／主题热重载。
-- 通过 Chromium 执行 Preflight、PDF 与逐页 PNG 导出。
+- 通过 Chromium 执行 Preflight、PDF 与逐页 PNG 导出，并将同一组 PNG 封装为高保真图片型 PPTX。
 - 输出机器可读检查报告和 PNG contact sheet。
 - 提供单元、契约、集成、浏览器和视觉回归测试。
 
@@ -53,7 +53,7 @@ npm run html-ppt -- preview examples/specimen.md \
   --port 4173
 ```
 
-导出 HTML、PDF、PNG 和 contact sheet：
+导出 HTML、PDF、PNG、图片型 PPTX 和 contact sheet：
 
 ```bash
 PLAYWRIGHT_BROWSERS_PATH=0 npm run html-ppt -- export examples/specimen.md \
@@ -72,6 +72,8 @@ PLAYWRIGHT_BROWSERS_PATH=0 npm run html-ppt -- check examples/specimen.md \
 ```
 
 输出目录不能预先存在，工具不会覆盖已有产物。`export` 先写入带 `.partial-*` 标识的工作目录，全部步骤成功后才原子重命名，并写入 `delivery.json` 完成标记。
+
+只生成图片型 PPTX 时使用 `--format pptx-flat`。该模式仍保留 `slides/`，因为 PPTX 的每一页都直接嵌入对应 PNG；页面视觉与 HTML 一致，但文字、图表和形状不可编辑。
 
 ## 演示播放
 
@@ -96,6 +98,7 @@ output/my-deck-export/
   report.json
   delivery.json
   deck.pdf
+  deck.pptx
   contact-sheet.html
   theme-review.html  # 仅参考图主题
   slides/
@@ -136,11 +139,11 @@ npm run test:visual
 
 ## 当前限制
 
-- v0.1 只支持固定 16∶9 画布。
+- 当前只支持固定 16∶9 画布。
 - 不提供可视化拖拽编辑器、在线服务和多人协作。
 - 不执行 Markdown 原始 HTML、脚本或远程图片。
-- 不支持任意 HTML 到可编辑 PPTX 的无损转换。
-- `pptx-flat` 和 `pptx-editable` 均未包含在 v0.1。
+- `pptx-flat` 只提供高保真图片页，不支持编辑页面内的文字、图表或形状，也不保留 HTML 动画与交互。
+- 不支持任意 HTML 到可编辑 PPTX 的无损转换；`pptx-editable` 仍是未实现、未承诺的独立后续能力。
 
 ## 文档
 
@@ -155,7 +158,9 @@ npm run test:visual
 - [v0.1 交付报告](docs/delivery-v0.1.md)
 - [Goal 002 交付报告](docs/delivery-goal-002.md)
 - [Goal 003 交付报告](docs/delivery-goal-003.md)
+- [Goal 004 交付报告](docs/delivery-goal-004.md)
 - [施工 Goal](goals/001-v0.1-mvp.md)
 - [Goal 002 施工清单](goals/002-reference-theme-real-deck.md)
 - [Goal 003 施工清单](goals/003-presentation-player-and-cosmic-motion.md)
+- [Goal 004 施工清单](goals/004-pptx-flat-export.md)
 - [项目路线图](ROADMAP.md)

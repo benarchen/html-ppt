@@ -2,7 +2,7 @@
 
 ## 当前阶段
 
-`v0.3.0` 已发布到公开 GitHub 仓库。用户已验证并接受 Goal 003 最终动态 HTML，Goal 状态为 `complete`；本地 `main` 继续跟踪 `origin/main`。
+`v0.3.0` 已发布到公开 GitHub 仓库，本地 `main` 继续跟踪 `origin/main`。Goal 004 图片型 PPTX 导出已由用户验收并更新为 `complete`，开发候选版本为 `0.4.0`；JSZip 最小 OOXML 实现、CLI 四格式矩阵、三主题与真实 27 页候选、完整质量门禁和 PowerPoint／Keynote 实机验收均已通过。未执行 commit、tag、push、Release、npm publish 或部署。
 
 ## 已完成
 
@@ -45,6 +45,9 @@
 - 完成 Goal 003 G11：触摸板状态机支持在惯性尾流尚未完全静默时识别新的同向加速手势，并保留单手势单页、反向立即生效和衰减尾流抑制。
 - 用户于 2026-09-02 验证并接受 `delivery-005`，Goal 003 完成定义全部满足，状态更新为 `complete`。
 - 创建实现提交 `8e6cb14` 和注解标签 `v0.3.0`，并通过 SSH 将 `main` 与标签推送到公开仓库。
+- 完成 Goal 004：统一版本来源，实现 HTML → PNG → 图片型 PPTX 的最小 OOXML 导出、CLI 四格式矩阵、原子交付和结构／哈希回归。
+- 完成三主题 specimen 与真实 27 页文稿共 63 页候选验证，并通过 PowerPoint／Keynote 实机兼容性验收。
+- 用户于 2026-09-03 明确接受本次施工结果，Goal 004 完成定义全部满足，状态更新为 `complete`。
 
 ## 进行中
 
@@ -53,13 +56,42 @@
 ## 待办
 
 - 如需 GitHub Release、npm publish 或部署，另行确认发布范围与内容。
-- 评估高保真不可编辑 PPTX 与有限可编辑 PPTX 两种输出模式；不属于 v0.1 已完成功能。
+- 有限可编辑 PPTX 继续保留为后续独立评估项。
+- 如需建设 CI、GitHub Release、npm publish 或部署，另立 Goal 并单独授权。
 
 ## 阻塞
 
-无。
+- 当前无工程阻塞。
 
 ## 最近验证
+
+- 2026-09-03：用户明确回复“接受本次施工成功”；Goal 004 最终真实文稿 PPTX 与施工结果验收通过，Goal 状态由 `blocked` 更新为 `complete`。CI 与公开分发决策保持不变，未执行 commit、tag、push、Release、npm publish 或部署。
+
+- 2026-09-03：Goal 004 实现、候选交付和双软件验收完成后，连续三轮唯一剩余条件均为用户明确验收，期间没有新的工程动作可推进；按 Goal 状态规则更新为 `blocked`。恢复条件为用户回复「接受」或提供修改意见。
+
+- 2026-09-03：完成四套 `0.4.0` 最终候选：`base-light`、`editorial-dark`、`cosmic-mint` 的 12 页 specimen，以及私有 27 页真实文稿，共 63 页。全部严格 Preflight 为 0 错误、0 警告；PDF 首尾页均为 `960 × 540pt`，PNG 均为 `2560 × 1440`，PPTX slide／media 数量与页数一致，63 张内嵌 PNG 与源 PNG 的 SHA-256 全部一致。
+
+- 2026-09-03：Microsoft PowerPoint for Mac 16.110.1（26062112）和 Apple Keynote 15.3.1（7050.1.1）均无修复、转换或不支持提示打开 12 页与 27 页最终候选；页数、首尾页、缩略图顺序、单图满版对象与放映模式检查正常。独立渲染脚本因缺少运行时未执行，没有安装全局依赖；限制已写入交付报告。
+
+- 2026-09-03：`0.4.0` 最终门禁通过：类型检查通过；32 项非浏览器测试为 31 通过、1 跳过；三主题契约通过；18 项浏览器回归与 4 组视觉回归全部通过，未更新视觉基线。隔离副本完成离线干净安装、0 漏洞审计、类型检查、非浏览器测试和主题契约；`git diff --check`、私有绝对路径、密钥模式和四份 PPTX 敏感信息扫描无命中。
+
+- 2026-09-03：完成 `docs/delivery-goal-004.md` 和长期文档同步。CI 决策为暂不修改、后续另立工程化 Goal；公开分发继续维持源码公开个人工具、`private: true`、`UNLICENSED`，npm 分发或 GitHub Release 需另立 Goal。当前等待用户验收，未执行 commit、tag、push、Release、npm publish 或部署。
+
+- 2026-09-03：完成 Goal 004 G2～G5 候选实现。移除带有两个未修复高危传递依赖的 PptxGenJS，只保留 `jszip@3.10.1`；在线 `npm audit --json` 为 0 个漏洞。新增图片型 PPTX 最小 OOXML、CLI 四格式矩阵、交付元数据、结构／哈希／失败原子性测试；阶段验证为类型检查通过、32 项非浏览器测试 31 通过 1 跳过、18 项 Chromium 浏览器测试全部通过。
+
+- 2026-09-03：首个 12 页 PPTX 候选在 PowerPoint 出现修复提示；修正 slide master 的 layout id 后，`output/goal-004-base-light-002/deck.pptx` 在 Microsoft PowerPoint 与 Apple Keynote 中均无修复或不支持提示打开，识别为 12 页；首尾页与放映模式检查正常，每页为一个满版 `960 × 540pt` 图片对象。独立渲染脚本因当前环境缺少所需运行时未执行，没有安装全局依赖。
+
+- 2026-09-03：项目开发候选版本统一升级为 `0.4.0`；CLI、构建元数据、build id、PPTX 应用元数据和 `package.json` 共用同一版本入口。最终全量门禁与四套交付产物尚待完成。
+
+- 2026-09-02：完成 Goal 004 G1。新增统一运行时版本入口，CLI 帮助和 `build.json.engineVersion` 均输出 `0.3.0`，build id 纳入相同版本；补充包版本一致性和构建元数据回归。`npm run typecheck` 通过，30 项非浏览器测试为 29 项通过、1 项按设计跳过；未修改 Deck IR、Markdown 或 Theme schema 版本。
+
+- 2026-09-02：复核并安装 `pptxgenjs@4.0.1` 与测试依赖 `jszip@3.10.1`；`npm ls` 依赖树完整，但 `npm audit --json` 报告 `image-size@1.2.1` 的 `GHSA-w3rx-r6r6-pgpr`、`GHSA-5p2g-fcmc-qvqq` 两个高危无限循环拒绝服务漏洞，官方 Advisory 标明 `<=2.0.2` 受影响且暂无修复版本。当前实现尚未引用 PptxGenJS，禁止执行会跨主版本降级的 `npm audit fix --force`，等待依赖路线决策。
+
+- 2026-09-02：Goal 004 施工基线为 `main@53600e1`、Node.js 26.0.0、npm 11.12.1；类型检查通过，29 项非浏览器测试为 28 通过、1 项按设计跳过，三主题契约、15 项 Chromium 回归和 4 组视觉回归全部通过。浏览器测试在受限沙箱首次无法启动，切换到允许启动 Chromium 与绑定本地回环端口的环境后通过。
+
+- 2026-09-02：用户明确要求开始实施 Goal 004；Goal 状态由 `planned` 更新为 `active`。当前尚未安装依赖、修改实现或生成候选 PPTX，先执行 `v0.3.0` 施工基线验证。
+
+- 2026-09-02：建立 `goals/004-pptx-flat-export.md`，冻结版本漂移修复、PptxGenJS 图片型 PPTX、CLI 格式矩阵、OOXML 自动化检查、PowerPoint／Keynote 实机验收、交付文档和后续工程化决策门禁；当前仅完成规划，未安装依赖、修改实现、生成 PPTX 或执行发布操作。
 
 - 2026-08-30：隔离副本 `/tmp/html-ppt-release-clean.gMJu3E` 执行 `npm ci --ignore-scripts`、类型检查、26 项非浏览器测试和双主题契约检查通过；非浏览器套件为 25 通过、1 项按设计跳过。
 - 2026-08-30：`npm run test:browser` 12 项全部通过，覆盖 Chromium、PDF／PNG、Preflight 错误矩阵、缩放、原子导出和预览热重载。

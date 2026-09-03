@@ -4,7 +4,7 @@
 
 本项目定位为：
 
-> 一个以 Markdown 为内容入口、以结构化 Deck IR 为核心、以 HTML 为唯一视觉真相源、以主题包承载视觉系统、可稳定导出 PDF 和 PNG 的演示文稿生成器。
+> 一个以 Markdown 为内容入口、以结构化 Deck IR 为核心、以 HTML 为唯一视觉真相源、以主题包承载视觉系统、可稳定导出 PDF、PNG 和高保真图片型 PPTX 的演示文稿生成器。
 
 核心流水线为：
 
@@ -21,7 +21,7 @@ HTML Renderer ←──── Theme Package
    ↓
 HTML／预览／截图／视觉检查
    ↓
-PDF／PNG／可选 PPTX
+PDF／PNG／图片型 PPTX
 ```
 
 设计重点不是简单完成“Markdown 转 HTML”，而是在输入与输出之间建立稳定的内容语义模型、主题契约、布局系统和视觉验收机制。
@@ -32,7 +32,8 @@ PDF／PNG／可选 PPTX
 
 - HTML：唯一标准产物，所有视觉效果以 HTML 为准。
 - PDF：HTML 的打印态派生物。
-- PNG：逐页渲染结果，用于分享、测试和未来打包进 PPTX。
+- PNG：逐页渲染结果，用于分享、测试和打包进图片型 PPTX。
+- PPTX：将同一组 `2560 × 1440` PNG 逐页封装进标准 16∶9 OOXML，每页只有一个满版图片对象。
 
 ### 2.2 PPTX 边界
 
@@ -42,14 +43,14 @@ PDF／PNG／可选 PPTX
 - 追求元素可编辑时，必须从 Deck IR 单独实现 PPTX Renderer，并限定支持的布局和样式子集。
 - 不尝试将任意 HTML 和 CSS 无损转换成可编辑 PPTX。
 
-未来 PPTX 可以提供两个明确模式：
+当前实现与未来边界明确分开：
 
 ```text
-export pptx-flat      # 高保真、不可编辑
-export pptx-editable  # 有限样式、可编辑
+export --format pptx-flat  # 已实现：高保真、不可编辑
+pptx-editable              # 未实现：有限样式、可编辑
 ```
 
-PptxGenJS 官方目前提供的 HTML 转换能力主要面向 HTML 表格，并不是通用网页转换器，因此不能作为任意 HTML 到可编辑 PPTX 的基础假设。参考：[PptxGenJS HTML to PowerPoint](https://gitbrent.github.io/PptxGenJS/docs/html-to-powerpoint/) 。
+`pptx-flat` 只接受通过 Preflight 的 HTML 派生 PNG，不读取 Markdown 或 Deck IR 重新排版。项目使用 JSZip 生成所需的最小 OOXML 部件，避免引入第二套布局引擎。可编辑模式如进入后续 Goal，仍必须从 Deck IR 单独设计 Renderer 与受支持样式子集。
 
 ## 3．架构原则
 
@@ -464,7 +465,7 @@ tests/
 6. 实现 Theme Package Contract → 验证：同一份 Markdown 无修改切换至少两个主题。
 7. 建立参考图提取工作流 → 验证：参考图能生成 Style Spec、主题包和 specimen 总览。
 8. 加入 Preflight 与视觉回归 → 验证：溢出、缺字体、缺图片和页面尺寸错误会导致构建失败。
-9. 评估 PPTX 输出 → 验证：分别定义高保真不可编辑模式和有限可编辑模式的验收标准。
+9. 实现高保真图片型 PPTX 输出 → 验证：OOXML 结构、内嵌图片哈希、PowerPoint 和 Keynote 实机验收通过；可编辑模式继续作为独立后续评估。
 
 ## 14．第一版成功标准
 

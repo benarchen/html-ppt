@@ -7,6 +7,7 @@ import { renderDeck } from "./renderer.js"
 import { checkAllThemes, loadTheme } from "./theme.js"
 import { LAYOUTS, type Deck, type PlannedDeck, type PreflightReport, type ThemePackage } from "./types.js"
 import { isInside, sha256 } from "./utils.js"
+import { HTML_PPT_VERSION } from "./version.js"
 
 export interface CompileOptions {
   projectRoot: string
@@ -48,7 +49,7 @@ export async function compileDeck(options: CompileOptions): Promise<CompiledDeck
   const theme = await loadTheme(rootReal, themeName)
   const plannedDeck = planDeck(deck)
   const html = await renderDeck(plannedDeck, theme, { projectRoot: rootReal, inputPath: inputReal })
-  const buildId = sha256(`${source}\0${theme.tokensCss}\0${theme.componentsCss}\0${JSON.stringify(theme.manifest)}\0engine:0.1.0`).slice(0, 16)
+  const buildId = sha256(`${source}\0${theme.tokensCss}\0${theme.componentsCss}\0${JSON.stringify(theme.manifest)}\0engine:${HTML_PPT_VERSION}`).slice(0, 16)
   return { deck, plannedDeck, theme, html, buildId, source }
 }
 
@@ -75,7 +76,7 @@ export async function writeBuild(compiled: CompiledDeck, outputDirectory: string
   const metadataPath = path.join(resolvedOutput, "build.json")
   const metadata = {
     schemaVersion: 1,
-    engineVersion: "0.1.0",
+    engineVersion: HTML_PPT_VERSION,
     buildId: compiled.buildId,
     source: compiled.deck.meta.source,
     theme: compiled.theme.manifest.name,

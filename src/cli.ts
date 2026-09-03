@@ -5,9 +5,11 @@ import { checkThemeSpecimens, compileDeck, recordBrowserMetadata, writeBuild } f
 import { HtmlPptError, formatError } from "./errors.js"
 import { exportContactSheet, exportPdf, exportPng, exportThemeReview } from "./exporter.js"
 import { parseMarkdownFile } from "./parser.js"
+import { exportPptxFlat } from "./pptx-flat.js"
 import { assertPreflight, runPreflight } from "./preflight.js"
 import { startPreview } from "./preview.js"
 import { isInside } from "./utils.js"
+import { HTML_PPT_VERSION } from "./version.js"
 
 type Command = "build" | "preview" | "export" | "check" | "inspect-ir" | "check-themes"
 
@@ -16,19 +18,19 @@ interface Arguments {
   input?: string
   theme?: string
   output?: string
-  format?: "pdf" | "png" | "all"
+  format?: "pdf" | "png" | "pptx-flat" | "all"
   port: number
   strict: boolean
   help: boolean
   logLevel: "quiet" | "normal" | "verbose"
 }
 
-const HELP = `html-ppt v0.1.0
+const HELP = `html-ppt v${HTML_PPT_VERSION}
 
 用法：
   html-ppt build <deck.md> [--theme <name>] [--output <dir>] [--log-level quiet|normal|verbose]
   html-ppt preview <deck.md> [--theme <name>] [--port <number>] [--log-level quiet|normal|verbose]
-  html-ppt export <deck.md> [--theme <name>] [--format pdf|png|all] [--output <dir>] [--log-level quiet|normal|verbose]
+  html-ppt export <deck.md> [--theme <name>] [--format pdf|png|pptx-flat|all] [--output <dir>] [--log-level quiet|normal|verbose]
   html-ppt check <deck.md> [--theme <name>] [--strict] [--output <dir>] [--log-level quiet|normal|verbose]
   html-ppt inspect-ir <deck.md>
   html-ppt check-themes
@@ -89,17 +91,27 @@ export async function main(argv = process.argv.slice(2)): Promise<number> {
     const expectedPages = compiled.plannedDeck.slides.length
     let pdfPages: number | undefined
     let pngPages: number | undefined
+    let pptxPages: number | undefined
     let themeReviewPath: string | undefined
     if (format === "pdf" || format === "all") {
       pdfPages = await exportPdf(build.htmlPath, path.join(build.outputDirectory, "deck.pdf"))
       if (pdfPages !== expectedPages) throw new HtmlPptError("EXPORT_PAGE_COUNT", `PDF 页数 ${pdfPages} 与 HTML 页数 ${expectedPages} 不一致`)
     }
-    if (format === "png" || format === "all") {
+    if (format === "png" || format === "pptx-flat" || format === "all") {
       const pngFiles = await exportPng(build.htmlPath, path.join(build.outputDirectory, "slides"))
       pngPages = pngFiles.length
       if (pngPages !== expectedPages) throw new HtmlPptError("EXPORT_PAGE_COUNT", `PNG 页数 ${pngPages} 与 HTML 页数 ${expectedPages} 不一致`)
       await exportContactSheet(build.outputDirectory, pngFiles, `${compiled.deck.meta.title} · ${compiled.theme.manifest.name}`)
       themeReviewPath = await exportThemeReview(build.outputDirectory, pngFiles, compiled.theme)
+      if (format === "pptx-flat" || format === "all") {
+        pptxPages = await exportPptxFlat(pngFiles, path.join(build.outputDirectory, "deck.pptx"), {
+          title: compiled.deck.meta.title,
+          language: compiled.deck.meta.language,
+          buildId: compiled.buildId,
+          slideLabels: compiled.plannedDeck.slides.map((slide) => slide.id),
+        })
+        if (pptxPages !== expectedPages) throw new HtmlPptError("EXPORT_PAGE_COUNT", `PPTX 页数 ${pptxPages} 与 HTML 页数 ${expectedPages} 不一致`)
+      }
     }
     const files = [
       "index.html",
@@ -108,7 +120,8 @@ export async function main(argv = process.argv.slice(2)): Promise<number> {
       "build.json",
       "report.json",
       ...(format === "pdf" || format === "all" ? ["deck.pdf"] : []),
-      ...(format === "png" || format === "all" ? ["slides/", "contact-sheet.html"] : []),
+      ...(format === "png" || format === "pptx-flat" || format === "all" ? ["slides/", "contact-sheet.html"] : []),
+      ...(format === "pptx-flat" || format === "all" ? ["deck.pptx"] : []),
       ...(themeReviewPath ? [path.basename(themeReviewPath)] : []),
     ]
     await writeFile(path.join(build.outputDirectory, "delivery.json"), `${JSON.stringify({
@@ -121,6 +134,13 @@ export async function main(argv = process.argv.slice(2)): Promise<number> {
         htmlPages: expectedPages,
         ...(pdfPages !== undefined ? { pdfPages } : {}),
         ...(pngPages !== undefined ? { pngPages, pngSize: "2560x1440" } : {}),
+        ...(pptxPages !== undefined ? {
+          pptxPages,
+          pptxMode: "flat",
+          pptxEditable: false,
+          pptxSize: "13.333333x7.5in",
+          pptxImageSize: "2560x1440",
+        } : {}),
       },
       files,
     }, null, 2)}\n`, { encoding: "utf8", flag: "wx" })
@@ -155,8 +175,8 @@ function parseArguments(argv: string[]): Arguments {
       if (value === "--theme") result.theme = next
       if (value === "--output") result.output = next
       if (value === "--format") {
-        if (!["pdf", "png", "all"].includes(next)) throw new HtmlPptError("CLI_FORMAT", `未知导出格式：${next}`)
-        result.format = next as "pdf" | "png" | "all"
+        if (!["pdf", "png", "pptx-flat", "all"].includes(next)) throw new HtmlPptError("CLI_FORMAT", `未知导出格式：${next}`)
+        result.format = next as "pdf" | "png" | "pptx-flat" | "all"
       }
       if (value === "--port") {
         const port = Number(next)
