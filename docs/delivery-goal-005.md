@@ -4,7 +4,7 @@
 
 Goal 005 已完成本地候选实现，开发候选版本为 `0.5.0`。浏览器安装、浏览器回归和视觉回归现在通过 Node.js 入口设置环境，不再要求用户使用 POSIX 的 `VAR=value command` 语法。
 
-最小 GitHub Actions CI 已配置 Ubuntu／Windows、Node.js 24 LTS 核心矩阵，并已在施工分支完成真实验证。范围内实现、最终本地门禁和隔离安装均已完成；工程完成后连续三轮仍未获得用户验收，Goal 按状态规则更新为 `blocked`。
+最小 GitHub Actions CI 已配置 Ubuntu／Windows、Node.js 24 LTS 核心矩阵，并已在施工分支完成真实验证。范围内实现、最终本地门禁和隔离安装均已完成；用户于 2026-09-04 明确接受最终结果，Goal 状态更新为 `complete`。
 
 ## 2．跨平台命令设计
 
@@ -104,4 +104,4 @@ Windows CI 验证路径分隔符和 Node.js 子进程行为；空格和中文路
 
 ## 8．验收状态
 
-Goal 005 当前为 `blocked`，唯一阻塞是用户最终验收。用户回复「接受」或提供修改意见后恢复；明确接受后才可以更新为 `complete` 并进入合并与标签流程。
+Goal 005 当前为 `complete`。用户已完成验收，施工分支进入 `main` 合并与 `v0.5.0` 标签收尾流程；GitHub Release、npm publish 和部署仍不在本 Goal 范围内。
