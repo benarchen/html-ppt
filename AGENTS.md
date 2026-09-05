@@ -62,4 +62,4 @@ npm run test:visual:update
 - PDF、PNG 和图片型 PPTX 导出前必须通过 Preflight。
 - `ERROR` 必须返回非零退出码；严格模式会把 `WARN` 升级为错误。
 - 主题必须通过 `npm run check:themes` 并覆盖全部 12 种标准布局。
-- 图片型 PPTX 已进入 `v0.4.0` 默认完整导出工作流；最小 CI 在 Goal 005 中实施，可编辑 PPTX、GitHub Release、npm publish 和部署仍属于独立后续工作。
+- 图片型 PPTX 已进入 `v0.4.0` 默认完整导出工作流；跨平台命令与最小 CI 已在 `v0.5.0` 实现，可编辑 PPTX、GitHub Release、npm publish 和部署仍属于独立后续工作。

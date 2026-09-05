@@ -2,7 +2,7 @@
 
 ## 1．交付结论
 
-Goal 004 已完成代码、自动化、候选产物、用户验收和远端发布，`v0.4.0` 是当前稳定版本及最新公开标签。同一份 Markdown 现在可以沿既有 HTML 主链路生成 HTML、PDF、PNG 和图片型 PPTX：
+Goal 004 已完成代码、自动化、候选产物、用户验收和远端发布；在 Goal 004 发布时，`v0.4.0` 是稳定版本及最新公开标签。同一份 Markdown 现在可以沿既有 HTML 主链路生成 HTML、PDF、PNG 和图片型 PPTX：
 
 ```text
 Markdown
